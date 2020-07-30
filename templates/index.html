@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="shortcut icon" href="#" />
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,800" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,500, 600, 700, 800" />
 
     <!-- Bootstrap CSS -->
     <link
@@ -69,19 +69,22 @@
           </ul>
         </div>
       </nav>
+
       <div class="jumbotron text-center">
         <h1 class="display-4">Covid19 Stats in the United States</h1>
         <p class="lead">
           View the two states with the greatest increase today, or select two different states of your choice.
         </p>
         <div class="row justify-content-center">
-          <a class="btn btn-primary btn-lg mr-4" role="button" id="testing" href="#">Highest increase in cases today </a>
-          <button onclick="msg()">testing msg function</button>
-          <button>testing javascript</button>
-          <div id="animal"></div>
-          <a class="btn btn-primary btn-lg" href="/get_usa_chart/" role="button">Highest increase in deaths today </a>
-          <input type = "button" id = "mybutton" value = "Click Here" />
-        
+          <a class="btn btn-primary btn-lg mr-4" role="button" href="/get_usa_chart/" >USA </a>
+          <a class="btn btn-primary btn-lg mr-4 dropdown-toggle" role="button"  id="testing" data-toggle="dropdown">Select State </a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/get_states_chart/">New York</a>
+            <a class="dropdown-item" href="/get_states_chart/">California</a>
+            <a class="dropdown-item" href="/get_states_chart/">Florida</a>
+        </div>
+          <!--button onclick="msg()">testing msg function</button-->
+      
         </div>
       </div>
 
@@ -89,9 +92,7 @@
         <div class="col-sm-12 col-md-6 mb-3">
           <div class="card">
             <div class="card-body text-center">
-              <h5 class="card-title">Florida Cases</h5>
-              <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Beatae, ut!</p>
-              <div id="usa"></div>
+              <div id="usa1" style="height:350px;"></div>
               <a href="#" class="card-link">more info</a>
             </div>
           </div>
@@ -100,9 +101,7 @@
         <div class="col-sm-12 col-md-6 mb-3">
           <div class="card">
             <div class="card-body text-center">
-              <h5 class="card-title">Texas Cases</h5>
-              <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Beatae, ut!</p>
-              <div id="usa2"></div>
+              <div id="usa2" style="height:350px;"></div>
               <a href="#" class="card-link">more info</a>
             </div>
           </div>
@@ -112,8 +111,7 @@
         <div class="col-sm-12 col-md-6 mb-3">
           <div class="card">
             <div class="card-body text-center">
-              <h5 class="card-title">Florida Deaths</h5>
-              <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Beatae, ut!</p>
+              <div id="states1" style="height:350px;"></div>
               <a href="#" class="card-link">more info</a>
             </div>
           </div>
@@ -121,8 +119,7 @@
         <div class="col-sm-12 col-md-6 mb-3">
           <div class="card">
             <div class="card-body text-center">
-              <h5 class="card-title">Texas Deaths</h5>
-              <p class="card-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Beatae, ut!</p>
+              <div id = "states2" style="height:350px;"></div>
               <a href="#" class="card-link">more info</a>
             </div>
           </div>
@@ -131,23 +128,70 @@
     </div>
     <script type="text/javascript">
       var graph_usa_cases = {{graphJSON_usa_cases | safe}};
-      var layout = {
-          title: 'Cases in the United States', xaxis: {
-            title: 'Date',
-            showgrid: false,
-            zeroline: false
-            },
-            yaxis: {
-                title: 'Cases',
-                showline: false
-            }
+      var graph_usa_deaths = {{graphJSON_usa_deaths | safe}};
+      var graph_states_cases = {{graphJSON_states_cases | safe}};
+      var graph_states_deaths = {{graphJSON_states_deaths | safe}};
+
+      var layout1 = {
+          title: {
+            text:'<span style="font-weight:600"> United States New Cases </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18
+            }},
         };
+ 
+        var layout2 = {
+          title: {
+            text:'<span style="font-weight:600"> United States New Deaths </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18
+            }},
+        };
+
+        var layout3 = {
+          title: {
+            text:'<span style="font-weight:600"> California New Cases </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18
+            }},
+        };
+ 
+        var layout4 = {
+          title: {
+            text:'<span style="font-weight:600"> California New Deaths </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18
+            }},
+        };
+
         var config = {responsive: true}
 
         if(graph_usa_cases.length>0){
-            Plotly.newPlot('usa',graph_usa_cases,layout, config);
-            Plotly.newPlot('usa2',graph_usa_cases,layout,config);
+            Plotly.newPlot('usa1',graph_usa_cases,layout1, config);
+            Plotly.newPlot('usa2',graph_usa_deaths,layout2,config);
+            var update = {
+                title: {text:"Deaths"},
+                opacity: 0.4,
+                'marker.color': 'green'
+            };
+            Plotly.restyle(usa2, update, 0);
         };
+
+        if(graph_states_cases.length>0){
+            Plotly.newPlot('states1',graph_states_cases,layout3, config);
+            Plotly.newPlot('states2',graph_states_deaths,layout4,config);
+            var update = {
+                title: {text:"Deaths"},
+                opacity: 0.4,
+                'marker.color': 'red'
+            };
+            Plotly.restyle(states2, update, 0);
+        };
+
     </script>
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
