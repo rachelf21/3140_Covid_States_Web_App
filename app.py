@@ -48,7 +48,7 @@ def get_states_data(state):
 stdata=get_states_data(selected_state)
 
 def get_max_increase(category):
-    global selected_state, selected_state2, max_3_cases, max_3_deaths
+    global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths
     max_3_cases=[]
     max_3_deaths=[]
     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
