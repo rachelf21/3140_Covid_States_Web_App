@@ -40,8 +40,11 @@
 
     <title>Tracking Covid19 in the Fifty States</title>
   </head>
+  
   <body>
-    <div class="container">
+    
+    <div class="container" >
+
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="#"> Covid19 States Tracker </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
@@ -68,7 +71,6 @@
         </div>
       </nav>
 
-
       <div class="jumbotron text-center">
         <h1 class="display-4">Covid19 in the United States</h1>
         <p class="lead">
@@ -80,12 +82,70 @@
           <a class="btn btn-primary btn-lg mr-4"  href="/get_max/deaths" >Max Daily New Deaths </a>
           <a class="btn btn-primary btn-lg mr-4 " role="button"  href="/states_page">Select State </a>
           <!--button onclick="msg()">testing msg function</button-->
+        </div>
+    </div>
+          
       
+      <div id="usa" class="row">
+        <div class="col-sm-12 col-md-6 mb-3">
+              <div id="usa1" style="height:350px;"></div>
+        </div>
+
+        <div class="col-sm-12 col-md-6 mb-3">
+              <div id="usa2" style="height:350px;"></div>
         </div>
       </div>
-        
+
     </div>
     
+    <script type="text/javascript">
+
+      
+      var graph_usa_cases = {{graphJSON_usa_cases | safe}};
+      var graph_usa_deaths = {{graphJSON_usa_deaths | safe}};
+
+      var layout1 = {
+          title: {
+            text:'<span style="font-weight:600"> United States Daily New Cases </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18
+            }},
+            margin:{
+              l:60,
+              r:10,
+              b:30,
+              t:30,
+              pad: 4
+            }
+        };
+ 
+        var layout2 = {
+          title: {
+            text:'<span style="font-weight:600"> United States Daily New Deaths </span>', 
+            font: {
+            family: 'Raleway',
+            size: 18}
+            },
+            margin:{
+              l:60,
+              r:10,
+              b:30,
+              t:30,
+              pad: 4
+            }
+        };;
+
+
+        var config = {responsive: true}
+
+        if(graph_usa_cases.length>0){
+            Plotly.newPlot('usa1',graph_usa_cases,layout1, config);
+            Plotly.newPlot('usa2',graph_usa_deaths,layout2,config);
+        };
+
+    </script>
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
