@@ -13,6 +13,13 @@ selected_state3 = "California"
 max_3_cases=[]
 max_3_deaths=[]
 
+color1 = 'rgb(56,83,93)'
+color2 = 'rgb(61,116,137)'
+color3 = 'rgb(67,149,179)'
+color4 = 'rgb(85,174,200)'
+color5 = 'rgb(116,191,195)'
+color6 = 'rgb(148,208,191)'
+
 graphJSON_usa_cases="[]"
 graphJSON_usa_deaths="[]"
 graphJSON_states_cases="[]"
@@ -97,7 +104,7 @@ def create_states2_chart(my_data=get_states_data(selected_state2)):
     trace_states_cases = go.Bar (
         x = my_data.date,
         y = my_data.case_increase,
-        #marker_color = 'rgb(142,124,0)'
+        marker_color = color4
         )
     data = [trace_states_cases]
     
@@ -106,7 +113,8 @@ def create_states2_chart(my_data=get_states_data(selected_state2)):
 
     trace_states_deaths = go.Bar (
         x = my_data.date,
-        y = my_data.death_increase
+        y = my_data.death_increase,
+        marker_color = color4
         )
     data = [trace_states_deaths]
     graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
@@ -126,7 +134,8 @@ def create_usa_chart(my_data=get_usa_data()):
     
     trace_usa_cases = go.Bar (
         x = my_data.date,
-        y = my_data.case_increase
+        y = my_data.case_increase,
+        marker_color = color6,
         )
     data = [trace_usa_cases]
     
@@ -134,7 +143,8 @@ def create_usa_chart(my_data=get_usa_data()):
     
     trace_usa_deaths = go.Bar (
         x = my_data.date,
-        y = my_data.death_increase
+        y = my_data.death_increase,
+        marker_color = color6,
         )
     data = [trace_usa_deaths]
     graphJSON_usa_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
@@ -151,7 +161,8 @@ def create_states_chart(my_data=get_states_data(selected_state)):
     
     trace_states_cases = go.Bar (
         x = my_data.date,
-        y = my_data.case_increase
+        y = my_data.case_increase,
+        marker_color = color4,
         )
     data = [trace_states_cases]
     
@@ -160,7 +171,8 @@ def create_states_chart(my_data=get_states_data(selected_state)):
     
     trace_states_deaths = go.Bar (
         x = my_data.date,
-        y = my_data.death_increase
+        y = my_data.death_increase,
+        marker_color = color4,
         )
     data = [trace_states_deaths]
     graphJSON_states_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
@@ -174,7 +186,7 @@ def create_states_chart(my_data=get_states_data(selected_state)):
 def get_max(category):
     get_max_increase(category)
     create_states_chart(my_data=get_states_data(selected_state))
-    create_states2_chart(my_data=get_states_data(selected_state2))
+    graphJSON_states2_cases, graphJSON_states2_deaths = create_states2_chart(my_data=get_states_data(selected_state2))
     graphJSON_states3_cases, graphJSON_states3_deaths = create_states2_chart(my_data=get_states_data(selected_state3))
     print("generating states chart from mask", category)
     return render_template('top_states.html',  
