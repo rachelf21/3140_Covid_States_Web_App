@@ -1,0 +1,16 @@
+TODO LIST
+
+Change get_max() to return an array of all states in sorted order. In order to do this, create HTML tags dynamically.
+
+Change Cases by State to dropdown list, select state, then state shows up. Don't need separate blank page.
+
+Implement choose  data source.
+
+Complete About page
+
+Create readme file
+
+Add more color
+
+Implement Compare States
+
