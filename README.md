@@ -2,7 +2,7 @@
 
 This web application allows the user to choose a data source, state, and dates and then generates charts for the data selected. [Click here to run the application.](https://cs3140-covid-web-app.herokuapp.com/)
 
-![Screenshot off app](/images/logo.png)
+![Screenshot off app](https://raw.githubusercontent.com/rachelf21/3140_Covid_States_Web_App/master/static/img/screenshot.jpg)
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ This web application allows the user to choose a data source, state, and dates a
     -static
         -css
         -js
-        -images
+        -img
     -templates
         -all html pages go here
     -venv
