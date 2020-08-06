@@ -46,15 +46,13 @@ pip install -r requirements.txt
 
 ## Deployment
 
-To upload to Heroku, all files must be in a repository. Create a Procfile and add the following line of code:
+Create a Procfile and add the following line of code:
 
 ```
 web: gunicorn app:app
 ```
 
-Then push the files to Heroku by running the following commands.
-
-For a more detailed step-by-step explannation, read [Deploying with Git](https://devcenter.heroku.com/articles/git).
+Use git to deploy to Heroko. Follow the steps below, or for a more detailed step-by-step explannation, read [Deploying with Git](https://devcenter.heroku.com/articles/git).
 
 ```
 git remote add herokoaddress - look up this command
@@ -63,7 +61,7 @@ git commit
 git push heroku master
 ```
 
-Your app should now run on the heroku server.
+Your app should now run on the Heroku server.
 
 ## Built With
 
@@ -74,4 +72,4 @@ Your app should now run on the heroku server.
 
 ## Author
 
-- **Rachel Friedman** - _Initial work_ - [My Github](https://github.com/rachelf21)
+- **Rachel Friedman** [View more of my work](https://github.com/rachelf21)
