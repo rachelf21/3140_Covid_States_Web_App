@@ -1,0 +1,32 @@
+{% extends "base.html" %} {%block title%} Form {%endblock%} Form.html {%block content%}
+
+<form method="POST" action="">
+  {{ form.hidden_tag() }}
+
+  <div class="form-group">
+    <legend class="border-bottom mb-4">View states currently reporting the most new {{category}}. </legend>
+    <!-- <div class="form-group">
+      {{ form.username.label(class="form-control-label") }} {% if form.username.errors %} {{ form.username(class="form-control
+      form-control-lg is-invalid") }}
+      <div class="invalid-feedback">
+        {% for error in form.username.errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% else %} {{ form.username(class="form-control form-control-lg") }} {% endif %}
+    </div>
+  </div> -->
+  <div class = "row"> 
+ 
+    
+    <div class = "col-3">{{ form.starting_date.label(class="form-control-label") }} {{ form.starting_date(class="form-control form-control-lg") }}</div>
+ 
+    <div class = "col-3">{{ form.amount.label(class="form-control-label") }} {{ form.amount(class="form-control form-control-lg") }}</div>
+
+
+    <div class = "col-2 d-flex flex-column justify-content-end"> {{ form.submit(class="btn btn-outline-info  form-control-lg") }} </div>
+</div>
+
+</form>
+
+{%endblock%}

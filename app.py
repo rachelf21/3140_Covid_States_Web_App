@@ -1,18 +1,21 @@
-from flask import Flask, render_template, url_for, jsonify, request
+from flask import Flask, render_template, url_for, jsonify, request, redirect, flash
 import json
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 import plotly 
 import plotly.graph_objs as go
+from forms import Top_States_Form
 
-user_state = "Idaho"
+user_state = ""
 selected_state = "California"
-selected_state2 = "California"
-selected_state3 = "California"
+starting_date = datetime(2020, 3, 1).date()
 max_3_cases=[]
 max_3_deaths=[]
+max_cases = []
+max_deaths = []
 curr_date = ''
+top = 3
 
 color1 = 'rgb(56,83,93)'
 color2 = 'rgb(61,116,137)'
@@ -33,8 +36,10 @@ graphJSON_states2_cases="[]"
 graphJSON_states2_deaths="[]"
 graphJSON_states3_cases="[]"
 graphJSON_states3_deaths="[]"
-graphsJSON_cases = []
-graphsJSON_deaths = []
+states = []
+df_states = []
+data_cases = []
+data_deaths = []
 st_increase_deaths = st_increase_cases = 0
 usa_increase_deaths = usa_increase_cases = 0
 curr_date = ''
@@ -54,8 +59,8 @@ def get_usa_data():
 
 usa_data = get_usa_data()
 
-def get_states_data(state):
-    global st_increase_deaths, st_increase_cases
+def get_states_data(state, starting_date): # add st_date as second parameter
+    global st_increase_deaths, st_increase_cases, curr_date
     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
     states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
     states_data['date'] = states_data['date'].dt.date
@@ -66,13 +71,14 @@ def get_states_data(state):
     st_increase_deaths = '{:,.0f}'.format(states_data['death_increase'].iloc[-1])
     st_increase_cases = '{:,.0f}'.format(states_data['case_increase'].iloc[-1])
     curr_date = states_data['date'].iloc[-1]   
-    print("retrieving states data")
+    #print("retrieving states data")
+    states_data = states_data[states_data.date >= starting_date]
     return states_data
 
-stdata=get_states_data(selected_state)
+stdata=get_states_data(selected_state, starting_date)
 
 def get_max_increase(category):
-    global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date
+    global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date, df_states
     max_3_cases=[]
     max_3_deaths=[]
     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
@@ -104,19 +110,15 @@ def get_max_increase(category):
         max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
         max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
     df = df.reset_index(drop=True)
+    df_states = df.state[df.date==curr_date]
     selected_state = df.state[0]
-    selected_state2 = df.state[1]
-    selected_state3 = df.state[2]
-    print("state with largest increase in", category, selected_state)
-    print("state with second largest increase in", category, selected_state2)
-    print("state with third largest increase in", category, selected_state3)
     return df
     
 max_cases = get_max_increase("cases")    
 max_deaths = get_max_increase("deaths")    
 
-def create_states2_chart(my_data=get_states_data(selected_state2)): 
-    global graphJSON_states2_cases, graphJSON_states2_deaths, graphsJSON_cases, graphsJSON_deaths
+def create_states2_chart(my_data=get_states_data(selected_state, starting_date)): 
+    global graphJSON_states2_cases, graphJSON_states2_deaths
     
     trace_states_cases = go.Bar (
         x = my_data.date,
@@ -127,7 +129,6 @@ def create_states2_chart(my_data=get_states_data(selected_state2)):
     data = [trace_states_cases]
     
     graphJSON_states2_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    graphsJSON_cases.append(graphJSON_states2_cases)
 
     trace_states_deaths = go.Bar (
         x = my_data.date,
@@ -137,19 +138,19 @@ def create_states2_chart(my_data=get_states_data(selected_state2)):
         )
     data = [trace_states_deaths]
     graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    graphsJSON_deaths.append(graphJSON_states2_deaths)
 
-    print("generating states2or3 chart")
+    #print("generating states2or3 chart")
     
     return graphJSON_states2_cases, graphJSON_states2_deaths
 
     
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 
 @app.route('/get_usa_chart/')
 def create_usa_chart(my_data=get_usa_data()): 
-    global graphJSON_usa_cases, graphJSON_usa_deaths
+    global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases
     
     trace_usa_cases = go.Bar (
         x = my_data.date,
@@ -179,10 +180,8 @@ def create_usa_chart(my_data=get_usa_data()):
 
 
 @app.route('/get_states_chart/')  #this route is note being used but the function is
-def create_states_chart(my_data=get_states_data(selected_state)): 
-    global graphJSON_states_cases, graphJSON_states_deaths, graphsJSON_cases, graphsJSON_deaths
-    graphsJSON_cases=[] 
-    graphsJSON_deaths=[]
+def create_states_chart(my_data=get_states_data(selected_state, starting_date)): 
+    global graphJSON_states_cases, graphJSON_states_deaths
     
     trace_states_cases = go.Bar (
         x = my_data.date,
@@ -191,9 +190,7 @@ def create_states_chart(my_data=get_states_data(selected_state)):
         opacity = .5
         )
     data = [trace_states_cases]
-    
     graphJSON_states_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    graphsJSON_cases.append(graphJSON_states_cases)
     
     trace_states_deaths = go.Bar (
         x = my_data.date,
@@ -203,7 +200,6 @@ def create_states_chart(my_data=get_states_data(selected_state)):
         )
     data = [trace_states_deaths]
     graphJSON_states_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    graphsJSON_deaths.append(graphJSON_states_deaths)
  
     print("generating states chart")
     return render_template('index.html',  graphJSON_states_cases=graphJSON_states_cases, graphJSON_states_deaths=graphJSON_states_deaths)
@@ -211,26 +207,32 @@ def create_states_chart(my_data=get_states_data(selected_state)):
 
 @app.route('/get_max/<category>')
 def get_max(category):
-    get_max_increase(category)
-    create_states_chart(my_data=get_states_data(selected_state))
-    graphJSON_states2_cases, graphJSON_states2_deaths = create_states2_chart(my_data=get_states_data(selected_state2))
-    graphJSON_states3_cases, graphJSON_states3_deaths = create_states2_chart(my_data=get_states_data(selected_state3))
-    print("generating states chart from mask", category)
-    return render_template('top_states.html',  
-                           selected_state = selected_state, 
-                           selected_state2 = selected_state2, 
-                           selected_state3 = selected_state3, 
-                           curr_date = curr_date,
-                           graphJSON_states_cases = graphJSON_states_cases,
-                           graphJSON_states_deaths = graphJSON_states_deaths,
-                           graphJSON_states2_cases = graphJSON_states2_cases,
-                           graphJSON_states2_deaths = graphJSON_states2_deaths,
-                           graphJSON_states3_cases = graphJSON_states3_cases,
-                           graphJSON_states3_deaths = graphJSON_states3_deaths,
-                           max_3_cases = max_3_cases,
-                           max_3_deaths = max_3_deaths,
-                           graphsJSON_cases = graphsJSON_cases,
-                           graphsJSON_deaths = graphsJSON_deaths)
+    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states
+    data_cases=[]
+    data_deaths=[]
+    states = []
+    
+    df = get_max_increase(category)  #returns df database - used for sorting purposes
+    max_cases = list(df['cases_increase'][df.date==curr_date])
+    max_deaths = list(df['deaths_increase'][df.date==curr_date])
+      
+    for i in range(top):
+        state = df_states[i]
+        states.append(state)
+        #print("state", state)
+        graph_cases, graph_deaths = create_states2_chart(my_data=get_states_data(state, starting_date))
+        data_cases.append(graph_cases)
+        data_deaths.append(graph_deaths)
+        
+    return render_template('top_states2.html', 
+                               states = states,
+                               data_cases = data_cases,
+                               data_deaths = data_deaths,
+                               curr_date = curr_date,
+                               max_cases = max_cases,
+                               max_deaths = max_deaths,
+                               max_3_cases = max_3_cases,
+                               max_3_deaths = max_3_deaths)
 
 
 @app.route('/SomeFunction')
@@ -242,7 +244,7 @@ def SomeFunction():
 def get_state():
     global user_state
     user_state = request.form['state']
-    create_states_chart(my_data=get_states_data(user_state))
+    graphJSON_states_cases, graphJSON_states_deaths = create_states2_chart(my_data=get_states_data(user_state, starting_date))
     print("User selected state: ", user_state)
     selected_state = user_state
     return render_template('select_state.html',  
@@ -261,14 +263,48 @@ def states_page():
 @app.route('/about.html')
 def about():
     return render_template('about.html')   
- 
+
+@app.route('/choose_top', methods=['GET', 'POST'])
+def choose_top():
+    print("testing choose top function")
+    return redirect('/')
+
+@app.route('/form/<category>', methods=['GET', 'POST'])
+def form(category):
+    global top, starting_date #fix starting_date later
+    form = Top_States_Form()
+    #form.amount.data = 3
+    #form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
+    if form.is_submitted():
+        print("Form validated!")
+        top = form.amount.data
+        st_date = form.starting_date.data 
+        starting_date = st_date #quick fix for now. fix this later
+        print("Starting Date: ", st_date)
+        get_max(category)
+        return render_template('top_states2.html', 
+                           states = states,
+                           data_cases = data_cases,
+                           data_deaths = data_deaths,
+                           curr_date = curr_date,
+                           max_cases = max_cases,
+                           max_deaths = max_deaths,
+                           max_3_cases = max_3_cases,
+                           max_3_deaths = max_3_deaths)
+    else:
+        flash('Login Unsuccessful. Please check username and password', 'danger')
+        return render_template('form.html', title='Select Top States', form=form, category=category)
+
+
+
+
 @app.route('/')
 def index():
     global graphJSON_usa_cases, graphJSON_usa_deaths;
     graphJSON_usa_cases="[]"
     graphJSON_usa_deaths="[]"
     create_usa_chart(my_data=get_usa_data())
-    return render_template('usa.html', graphJSON_usa_cases=graphJSON_usa_cases, graphJSON_usa_deaths=graphJSON_usa_deaths, selected_state = selected_state, selected_state2 = selected_state2)
+    return render_template('usa.html', graphJSON_usa_cases=graphJSON_usa_cases, graphJSON_usa_deaths=graphJSON_usa_deaths)
 
 
 if __name__ == '__main__':
