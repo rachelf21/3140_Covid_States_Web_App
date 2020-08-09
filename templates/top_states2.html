@@ -1,39 +1,32 @@
 {%extends "base.html"%} {%block title%} View by Cases {%endblock%} {% block content %}
-<div id="main" class="row">
+<div>
+  <legend style="text-align: center;" class="border-bottom mb-4">
+    States currently reporting the greatest increase of {{category}} for {{curr_date}}
+  </legend>
+</div>
+<div id="main">
   <div id="div_left" class="col"></div>
   <div id="div_right" class="col"></div>
 </div>
 
 <script>
-    var states_list = {{states | safe}};
-    var max_deaths = {{max_deaths | safe}};
-    var max_cases = {{max_cases | safe}};
+  var states_list = {{states | safe}};
+  var max_deaths = {{max_deaths | safe}};
+  var max_cases = {{max_cases | safe}};
+  var data_cases = {{data_cases | safe}};
+  var data_deaths = {{data_deaths | safe}};
+  console.log(data_deaths[0]);
 
-    var msg_txs = "* On 7/27/20, Texas state health officials changed their method of reporting, adding deaths not previously reported.";
-    console.log(states_list);
-    var layoutNEW = {
-    title: {
-      text:'<span style="font-weight:600"><br> Daily New Deaths </span>',
-      font: {
-      family: 'Raleway',
-      size: 18
-      }},
-      margin:{
-        l:60,
-        r:30,
-        b:30,
-        t:50,
-        pad: 4
-      }
-  };
+  var msg_txs = "* On 7/27/20, Texas state health officials changed their method of reporting, adding deaths not previously reported.";
+  console.log(states_list);
 </script>
 
 {% for row in data_cases %}
 <script>
   var x = {{loop.index}}-1;
-  var layoutNEW = {
+  var layoutCASES = {
     title: {
-      text:'<span style="font-weight:600"><br>' + states_list[x] + ' Daily New Cases </span>',
+      text:'<span style="text-muted font-weight-light"><br>' + states_list[x] + ' Daily New Cases </span>',
       font: {
       family: 'Raleway',
       size: 18
@@ -44,33 +37,93 @@
         b:30,
         t:50,
         pad: 4
-      }
+      },
+      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: "rgba(0,0,0,0)"
+  };
+  var layoutDEATHS = {
+    title: {
+      text:'<span style="text-muted font-weight-light"><br> '+ states_list[x] + ' Daily New Deaths </span>',
+      font: {
+      family: 'Raleway',
+      size: 18
+      }},
+      margin:{
+        l:60,
+        r:30,
+        b:30,
+        t:50,
+        pad: 4
+      },
+      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: "rgba(0,0,0,0)"
   };
   var config = {responsive: true};
-  var data = {{row | safe}};
-  div_left.appendChild(document.createElement("hr"));
+  var cases = {{row | safe}};
+  console.log(cases);
+
+  var div = document.createElement("div");
+  div.setAttribute("id", "div"+x);
+  //div.setAttribute("style","border: 4px solid");
+  div.setAttribute("style", "background-color: rgba(144, 12, 63, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px");
+  div.setAttribute("class","mt-4 mb-4");
+  main.appendChild(div);
+
+  var div_state = document.createElement("div");
+  div_state.setAttribute("id", "div_state_"+x);
+  //div_state.setAttribute("style","border: 1px solid;");
+  div_state.setAttribute("style","background-color: rgb(144,12,62); border-radius:10px");
+  div_state.setAttribute("class","row border-bottom mr-0 ml-0");
+  div.appendChild(div_state);
+
   var state_name = document.createElement("h2");
   state_name.setAttribute("id", "st_name"+x);
-  state_name.innerHTML = x+1+". " +states_list[x];
-  div_left.appendChild(state_name);
-  var newDiv = document.createElement("div");
-  newDiv.setAttribute("id", "states_cases"+x);
-  newDiv.style.height = "350px";
-  div_left.appendChild(newDiv);
-  Plotly.newPlot('states_cases'+x,data,layoutNEW, config);
-  if(states_list[x]== "Texas"){
-    div_spacer = document.createElement("div");
-    div_spacer.style.height = "54px";
-    div_left.appendChild(div_spacer);
-    }
-  /*var update = {
-      title: 'some new title', // updates the title
-  };
-  Plotly.relayout(newDiv, update)*/
+  state_name.innerHTML = x+1+"|    " +states_list[x].toUpperCase();
+  state_name.setAttribute("style", "color: rgb(85, 41, 116);");
+  state_name.setAttribute("style", "color: rgb(255, 255, 240);");
+  state_name.setAttribute("class","col pt-2 ml-2 font-weight-light");
+  div_state.appendChild(state_name);
+
+  var div_img = document.createElement("div");
+  div_img.setAttribute("style", "text-align: right");
+  div_img.setAttribute("class", "pt-1 col");
+  var state_flag = document.createElement("img");
+  var image = "/static/img/flags/" + states_list[x] + ".png";
+  state_flag.setAttribute("src", image);
+  state_flag.setAttribute("style", "height: 46px; border: 1px solid rgb(200,200,200); border-radius:10%;");
+
+  //state_flag.setAttribute("class", "mr-auto");
+  div_state.appendChild(div_img);
+  div_img.appendChild(state_flag);
+
+  var div_chart = document.createElement("div");
+  div_chart.setAttribute("id", "div_charts_"+x);
+  div_chart.setAttribute("class", "row ml-4 mr-4");
+  //div_chart.setAttribute("style","border: 1px solid red;");
+  div.appendChild(div_chart);
+
+  var div_cases = document.createElement("div");
+  div_cases.setAttribute("id", "div_cases_"+x);
+  //div_cases.setAttribute("style","border: 2px solid yellow;");
+  div_cases.setAttribute("class", "col-md-6");
+  div_chart.appendChild(div_cases);
+
+  var div_cases_chart = document.createElement("div");
+  div_cases_chart.setAttribute("id", "div_cases_chart_"+x);
+  //div_cases_chart.setAttribute("style","border: 1px solid;");
+  div_cases_chart.style.height = "350px";
+  div_cases.appendChild(div_cases_chart);
+  Plotly.newPlot("div_cases_chart_"+x,cases,layoutCASES, config);
+
+  var div_cases_stats = document.createElement("div");
+  div_cases_stats.setAttribute("id", "div_cases_stats_"+x);
+  //div_cases_stats.setAttribute("style","border: 1px solid;");
+  div_cases.appendChild(div_cases_stats);
+
   var div_stats = document.createElement("div");
   div_stats.style.position = "relative";
   div_stats.style.height = "50px";
-  div_left.appendChild(div_stats);
+  div_cases_stats.appendChild(div_stats);
   var div_stats01 = document.createElement("div");
   div_stats01.style.position = "absolute";
   div_stats01.style.bottom = "0";
@@ -78,7 +131,7 @@
   div_stats.appendChild(div_stats01);
   var num_cases = document.createElement("h2");
   num_cases.setAttribute("id", "state"+x+"_cases");
-  num_cases.setAttribute("class", "text-muted");
+  num_cases.setAttribute("class", "font-weight-light");
   num_cases.innerHTML = "+"+max_cases[x];
   div_stats01.appendChild(num_cases);
   var div_stats02 = document.createElement("div");
@@ -88,67 +141,45 @@
   div_stats.appendChild(div_stats02);
   var date_cases = document.createElement("h6");
   date_cases.setAttribute("name", "latest_date_"+x+"_cases");
-  date_cases.setAttribute("class", "text-muted");
+  date_cases.setAttribute("class", "text-muted font-weight-light");
   date_cases.innerHTML = "{{curr_date}}";
   div_stats02.appendChild(date_cases);
-</script>
-{% endfor %} {% for info in data_deaths %}
-<script>
-  var x = {{loop.index}}-1;
-  var layout2 = {
-    title: {
-      text:'<span style="font-weight:600"><br>' + states_list[x] + ' Daily New Deaths </span>',
-      font: {
-      family: 'Raleway',
-      size: 18
-      }},
-      margin:{
-        l:60,
-        r:30,
-        b:30,
-        t:50,
-        pad: 4
-      }
-  };
-  var config = {responsive: true}
-  var data = {{info | safe}};
-  div_right.appendChild(document.createElement("hr"));
-  var state_name = document.createElement("h2");
-  state_name.setAttribute("id", "st_name"+x);
-  state_name.innerHTML = states_list[x];
-  state_name.setAttribute("class" , "text-white");
-  //div_right.appendChild(state_name);
 
-  var div_img = document.createElement("div");
-  div_img.setAttribute("style", "text-align: right");
-  var state_flag = document.createElement("img");
-  var image = "/static/img/flags/" + states_list[x] + ".png";
-  state_flag.setAttribute("src",image );
-  state_flag.setAttribute("style", "height: 46px; border: 1px solid; ");
 
-  state_flag.setAttribute("class", "mr-auto");
-  div_right.appendChild(div_img);
-  div_img.appendChild(state_flag);
+  var div_deaths = document.createElement("div");
+  div_deaths.setAttribute("id", "div_deaths_"+x);
+  //div_deaths.setAttribute("style","border: 2px solid yellow;");
+  div_deaths.setAttribute("class", "col-md-6");
+  div_chart.appendChild(div_deaths);
 
-  var newDiv2 = document.createElement("div");
-  newDiv2.setAttribute("id", "states_deaths"+x);
-  newDiv2.style.height = "350px";
-  div_right.appendChild(newDiv2);
-  Plotly.newPlot('states_deaths'+x,data,layout2, config);
+  var div_deaths_chart = document.createElement("div");
+  div_deaths_chart.setAttribute("id", "div_deaths_chart_"+x);
+  //div_deaths_chart.setAttribute("style","border: 1px solid;");
+  div_deaths_chart.style.height = "350px";
+  div_deaths.appendChild(div_deaths_chart);
+  deaths = JSON.parse(data_deaths[x]);
+  Plotly.newPlot("div_deaths_chart_"+x,deaths,layoutDEATHS, config);
+
   if(states_list[x]== "Texas"){
-     var a = document.createElement("a");
-     a.href="https://www.dshs.texas.gov/news/releases/2020/20200727.aspx";
-     a.target = "_blank";
-     var extra_info = document.createElement("p");
-     extra_info.setAttribute("class" ,"small ml-5 font-weight-light font-italic btn-link mr-3");
-     extra_info.innerHTML = msg_txs;
-     a.appendChild(extra_info);
-     div_right.appendChild(a);
-   }
+    var a = document.createElement("a");
+    a.href="https://www.dshs.texas.gov/news/releases/2020/20200727.aspx";
+    a.target = "_blank";
+    var extra_info = document.createElement("p");
+    extra_info.setAttribute("class" ,"small ml-5 font-weight-light font-italic btn-link mr-3");
+    extra_info.innerHTML = msg_txs;
+    a.appendChild(extra_info);
+    div_deaths.appendChild(a);
+  }
+
+  var div_deaths_stats = document.createElement("div");
+  div_deaths_stats.setAttribute("id", "div_deaths_stats_"+x);
+  //div_deaths_stats.setAttribute("style","border: 1px solid;");
+  div_deaths.appendChild(div_deaths_stats);
+
   var div_stats0 = document.createElement("div");
   div_stats0.style.position = "relative";
   div_stats0.style.height = "50px";
-  div_right.appendChild(div_stats0);
+  div_deaths_stats.appendChild(div_stats0);
   var div_stats1 = document.createElement("div");
   div_stats1.style.position = "absolute";
   div_stats1.style.bottom = "0";
@@ -156,7 +187,7 @@
   div_stats0.appendChild(div_stats1);
   var num_deaths = document.createElement("h2");
   num_deaths.setAttribute("id", "state"+x+"_deaths");
-  num_deaths.setAttribute("class", "text-muted");
+  num_deaths.setAttribute("class", "font-weight-light");
   console.log(max_deaths[x]);
   num_deaths.innerHTML = "+"+max_deaths[x];
   div_stats1.appendChild(num_deaths);
@@ -167,8 +198,15 @@
   div_stats0.appendChild(div_stats2);
   var date_deaths = document.createElement("h6");
   date_deaths.setAttribute("name", "latest_date_"+x+"_deaths");
-  date_deaths.setAttribute("class", "text-muted");
+  date_deaths.setAttribute("class", "text-muted font-weight-light");
   date_deaths.innerHTML = "{{curr_date}}";
   div_stats2.appendChild(date_deaths);
+
+
+
+  /*var update = {
+      title: 'some new title', // updates the title
+  };
+  Plotly.relayout(newDiv, update)*/
 </script>
-{% endfor %} {%endblock%}
+{%endfor%} {%endblock%}

@@ -142,11 +142,11 @@
           View graphs of daily new cases and new deaths in the United States and in specific states. 
         </p>
         <div class="row justify-content-center">
-          <a class="btn btn-primary btn-lg mr-4"  href="/get_usa_chart/">Country Overview</a>
-          <a class="btn btn-primary btn-lg mr-4"  href="/form/cases" >View by New Cases </a>
-          <a class="btn btn-primary btn-lg mr-4"  href="/form/deaths" >View by New Deaths </a>
+          <a class="btn btn-primary btn-lg mr-4 mt-2"  href="/get_usa_chart/">Country Overview</a>
+          <a class="btn btn-primary btn-lg mr-4 mt-2"  href="/form/cases" >View by New Cases </a>
+          <a class="btn btn-primary btn-lg mr-4 mt-2"  href="/form/deaths" >View by New Deaths </a>
           <form class="form-inline" name="myForm" action="{{ url_for('get_state') }}" method="POST" >
-            <select  class="btn btn-primary btn-lg  mr-4" id="state" name="state" onchange="this.form.submit()">
+            <select  class="btn btn-primary btn-lg  mr-4 mt-2" id="state" name="state" onchange="this.form.submit()">
                 <option value="selectstate">-Select State-</option>
                 <option value="Alabama">Alabama</option>
                 <option value="Alaska">Alaska</option>

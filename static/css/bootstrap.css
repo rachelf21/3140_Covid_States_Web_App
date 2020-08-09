@@ -2722,8 +2722,9 @@ fieldset:disabled a.btn {
 
 .btn-primary {
   color: #fff;
-  background-color: #4395b3;
-  border-color: #4395b3;
+  /* background-color: rgb(144, 12, 62); */
+  background-color: rgb(85, 41, 116);
+  /* border-color: #4395b3; */
 }
 
 .btn-primary:hover {
@@ -5575,8 +5576,10 @@ a.badge-dark.focus {
 .jumbotron {
   padding: 2rem 1rem;
   margin-bottom: 2rem;
-  background-color: #e9ecef;
+  /* background-color: #e9ecef; */
+  background-color: rgba(144, 12, 63, 0.06);
   border-radius: 0.3rem;
+  border: 1px var(--secondary);
 }
 
 @media (min-width: 576px) {
@@ -7085,7 +7088,9 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #4395b3 !important;
+  background-color: rgb(85, 41, 116) !important;
+  /* purple = rgb(85, 41, 116)
+  burgundy = rgb(144, 12, 62) */
 }
 
 a.bg-primary:hover,

@@ -23,10 +23,14 @@ color3 = 'rgb(67,149,179)'
 color4 = 'rgb(85,174,200)'
 color5 = 'rgb(116,191,195)'
 color6 = 'rgb(148,208,191)'
-teal = 'rgba(109, 43, 173)'
+#teal = 'rgb(109, 43, 173)'  
+teal = 'rgb(67, 149, 179)'
+green = 'rgb(87,24,69)'
 purple = 'rgb(85, 41, 116)'
-green = 'rgb(32,171,125)'
-orange = 'rgb(255,124,48)'
+burgundy = 'rgb(144, 12, 62)'
+red = 'rgb(199,0,57)'
+orange = 'rgb(255,87,51)'
+yellow = 'rgb(255,195,0)'
 
 graphJSON_usa_cases="[]"
 graphJSON_usa_deaths="[]"
@@ -124,17 +128,17 @@ def create_states2_chart(my_data=get_states_data(selected_state, starting_date))
         x = my_data.date,
         y = my_data.case_increase,
         marker_color = orange,
-        opacity = .5
+        opacity = .95
         )
     data = [trace_states_cases]
     
     graphJSON_states2_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
 
-    trace_states_deaths = go.Bar (
+    trace_states_deaths = go.Bar(
         x = my_data.date,
         y = my_data.death_increase,
-        marker_color = purple,
-        opacity = .5
+        marker_color = burgundy,
+        opacity = .95
         )
     data = [trace_states_deaths]
     graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
@@ -183,7 +187,7 @@ def create_usa_chart(my_data=get_usa_data()):
 def create_states_chart(my_data=get_states_data(selected_state, starting_date)): 
     global graphJSON_states_cases, graphJSON_states_deaths
     
-    trace_states_cases = go.Bar (
+    trace_states_cases = go.Scatter (
         x = my_data.date,
         y = my_data.case_increase,
         marker_color = orange,
@@ -192,7 +196,7 @@ def create_states_chart(my_data=get_states_data(selected_state, starting_date)):
     data = [trace_states_cases]
     graphJSON_states_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
     
-    trace_states_deaths = go.Bar (
+    trace_states_deaths = go.Scatter (
         x = my_data.date,
         y = my_data.death_increase,
         marker_color = purple,
@@ -274,7 +278,7 @@ def form(category):
     global top, starting_date #fix starting_date later
     form = Top_States_Form()
     #form.amount.data = 3
-    #form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
+    form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
     if form.is_submitted():
         print("Form validated!")
         top = form.amount.data
@@ -290,7 +294,8 @@ def form(category):
                            max_cases = max_cases,
                            max_deaths = max_deaths,
                            max_3_cases = max_3_cases,
-                           max_3_deaths = max_3_deaths)
+                           max_3_deaths = max_3_deaths,
+                           category=category)
     else:
         flash('Login Unsuccessful. Please check username and password', 'danger')
         return render_template('form.html', title='Select Top States', form=form, category=category)
@@ -304,7 +309,12 @@ def index():
     graphJSON_usa_cases="[]"
     graphJSON_usa_deaths="[]"
     create_usa_chart(my_data=get_usa_data())
-    return render_template('usa.html', graphJSON_usa_cases=graphJSON_usa_cases, graphJSON_usa_deaths=graphJSON_usa_deaths)
+    return render_template('usa.html', 
+                           graphJSON_usa_cases=graphJSON_usa_cases, 
+                           graphJSON_usa_deaths=graphJSON_usa_deaths,
+                           usa_increase_deaths = usa_increase_deaths,
+                           usa_increase_cases = usa_increase_cases,
+                           curr_date = curr_date)
 
 
 if __name__ == '__main__':
