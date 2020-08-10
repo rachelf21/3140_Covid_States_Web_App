@@ -65,14 +65,22 @@
   var div = document.createElement("div");
   div.setAttribute("id", "div"+x);
   //div.setAttribute("style","border: 4px solid");
-  div.setAttribute("style", "background-color: rgba(144, 12, 63, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px");
+  if( "{{category}}" == "cases") {
+    div.setAttribute("style", "background-color: rgba(255,87,51, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px"); //orange cases
+  } else {
+    div.setAttribute("style", "background-color: rgba(144, 12, 63, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px"); //burgundy deaths
+  }
   div.setAttribute("class","mt-4 mb-4");
   main.appendChild(div);
 
   var div_state = document.createElement("div");
   div_state.setAttribute("id", "div_state_"+x);
   //div_state.setAttribute("style","border: 1px solid;");
-  div_state.setAttribute("style","background-color: rgb(144,12,62); border-radius:10px");
+  if( "{{category}}" == "cases") {
+    div_state.setAttribute("style","background-color: rgb(255,87,51); border-radius:10px");  //orange cases
+  } else {
+    div_state.setAttribute("style","background-color: rgb(144,12,62); border-radius:10px"); //burgundy deaths
+  }
   div_state.setAttribute("class","row border-bottom mr-0 ml-0");
   div.appendChild(div_state);
 

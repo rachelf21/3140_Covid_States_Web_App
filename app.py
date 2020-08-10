@@ -160,7 +160,7 @@ def create_usa_chart(my_data=get_usa_data()):
         x = my_data.date,
         y = my_data.case_increase,
         marker_color = orange,
-        opacity = .5
+        opacity = .95
         )
     data = [trace_usa_cases]
     
@@ -169,8 +169,8 @@ def create_usa_chart(my_data=get_usa_data()):
     trace_usa_deaths = go.Bar (
         x = my_data.date,
         y = my_data.death_increase,
-        marker_color = purple,
-        opacity = .5
+        marker_color = burgundy,
+        opacity = .95
         )
     data = [trace_usa_deaths]
     graphJSON_usa_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 

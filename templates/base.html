@@ -146,7 +146,7 @@
           <a class="btn btn-primary btn-lg mr-4 mt-2"  href="/form/cases" >View by New Cases </a>
           <a class="btn btn-primary btn-lg mr-4 mt-2"  href="/form/deaths" >View by New Deaths </a>
           <form class="form-inline" name="myForm" action="{{ url_for('get_state') }}" method="POST" >
-            <select  class="btn btn-primary btn-lg  mr-4 mt-2" id="state" name="state" onchange="this.form.submit()">
+            <select style="background-color: rgb(85, 41, 116)" class="btn btn-primary btn-lg  mr-4 mt-2" id="state" name="state" onchange="this.form.submit()">
                 <option value="selectstate">-Select State-</option>
                 <option value="Alabama">Alabama</option>
                 <option value="Alaska">Alaska</option>
