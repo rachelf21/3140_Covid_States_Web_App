@@ -1,86 +1,75 @@
-{% extends "base.html" %} {%block title%} Covid19 in {{selected_state}} {%endblock%} 
+{% extends "base.html" %} {%block title%} Covid19 in {{selected_state}} {%endblock%} {%block content%}
+<script>
+  function validate() {
+    var x = document.forms["myForm"]["state"].value;
+    if (x == "selectstate") {
+      alert("Please select a state");
+      return false;
+    }
+  }
+</script>
 
-{%block content%} 
-      <script>
-        function validate() {
-        var x = document.forms["myForm"]["state"].value;
-            if(x == "selectstate"){
-                alert('Please select a state');
-                return false;
-            }
-          }		
-        </script>
-
-      <div class="row">
-        <div class="col-sm-12 col-md-6 mb-3">
-              <div id="states1" style="height:400px;"></div>
-              <div style="position: relative; height:50px">&nbsp;
-                <div style="position: absolute; bottom: 0; right: 0"><h2 id="state1_cases" name="state1_cases" class="font-weight-light"></h2></div>
-                <div style="position: absolute; bottom: 0; right: 120px"><h6 name="latest_date" class="text-muted font-weight-light"></h6></div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-6 mb-3">
-              <div id = "states2" style="height:400px;"></div>
-              <div style="position: relative; height:50px">&nbsp;
-                <div style="position: absolute; bottom: 0; right: 0"><h2 id="state1_deaths" name="state1_deaths" class="font-weight-light"></h2></div>
-                <div style="position: absolute; bottom: 0; right: 120px"><h6 name="latest_date" class="text-muted font-weight-light"></h6></div>
-            </div>
-        </div>
-      </div>     
-      
+<div class="row">
+  <div class="col-sm-12 col-md-6 mb-3">
+    <div id="states1" style="height: 400px;"></div>
+    <div style="position: relative; height: 50px;">
+      &nbsp;
+      <div style="position: absolute; bottom: 0; right: 0;">
+        <h2 id="state1_cases" class="font-weight-light">+ {{st_increase_cases}}</h2>
+      </div>
+      <div style="position: absolute; bottom: 0; right: 120px;"><h6 class="text-muted font-weight-light">{{curr_date}}</h6></div>
     </div>
-    
-    <script type="text/javascript">
+  </div>
+  <div class="col-sm-12 col-md-6 mb-3">
+    <div id="states2" style="height: 400px;"></div>
+    <div style="position: relative; height: 50px;">
+      &nbsp;
+      <div style="position: absolute; bottom: 0; right: 0;">
+        <h2 id="state1_deaths" class="font-weight-light">+ {{st_increase_deaths}}</h2>
+      </div>
+      <div style="position: absolute; bottom: 0; right: 120px;"><h6 class="text-muted font-weight-light">{{curr_date}}</h6></div>
+    </div>
+  </div>
+</div>
 
-      var graph_states_cases = {{graphJSON_states_cases | safe}};
-      var graph_states_deaths = {{graphJSON_states_deaths | safe}};
-
-      document.getElementById("state1_cases").innerHTML = "+ {{st_increase_cases}}";
-      document.getElementById("state1_deaths").innerHTML = "+ {{st_increase_deaths}}";
-
-      for(i=0; i<2; i++){
-        document.getElementsByName("latest_date")[i].innerHTML =  "{{curr_date}}";
-      }
-
-      var layout1 = {
-          title: {
-            text:'<span style="font-weight-light"><br> {{selected_state}} Daily New Cases </span>', 
-            font: {
-            family: 'Raleway',
-            size: 18
-            }},
-            margin:{
-              l:60,
-              r:10,
-              b:30,
-              t:100,
-              pad: 4
-            }
-        };
- 
-        var layout2 = {
-          title: {
-            text:'<span style="font-weight-light"><br> {{selected_state}} Daily New Deaths </span>', 
-            font: {
-            family: 'Raleway',
-            size: 18}
-            },
-            margin:{
-              l:60,
-              r:10,
-              b:30,
-              t:100,
-              pad: 4
-            }
-        };
-
-        var config = {responsive: true}
-
-        if(graph_states_cases.length>0){
-            Plotly.newPlot('states1',graph_states_cases,layout1, config);
-            Plotly.newPlot('states2',graph_states_deaths,layout2,config);        
-        };
-
-    </script>
+<script>
+  var graph_states_cases = {{graphJSON_states_cases | safe}};
+  var graph_states_deaths = {{graphJSON_states_deaths | safe}};
+  var layout1 = {
+      title: {
+        text:'<span style="font-weight-light"><br> {{selected_state}} Daily New Cases </span>',
+        font: {
+        family: 'Raleway',
+        size: 18
+        }},
+        margin:{
+          l:60,
+          r:10,
+          b:30,
+          t:100,
+          pad: 4
+        }
+    };
+  var layout2 = {
+      title: {
+        text:'<span style="font-weight-light"><br> {{selected_state}} Daily New Deaths </span>',
+        font: {
+        family: 'Raleway',
+        size: 18}
+        },
+        margin:{
+          l:60,
+          r:10,
+          b:30,
+          t:100,
+          pad: 4
+        }
+    };
+    var config = {responsive: true}
+    if(graph_states_cases.length>0){
+        Plotly.newPlot('states1',graph_states_cases,layout1, config);
+        Plotly.newPlot('states2',graph_states_deaths,layout2,config);
+    };
+</script>
 
 {%endblock%}
