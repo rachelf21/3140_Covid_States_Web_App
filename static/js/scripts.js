@@ -3,6 +3,17 @@ function msg() {
   console.log("inside msg function");
   return;
 }
+
+function todaysDate() {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mmmm = today.toLocaleString("default", { month: "long" });
+  var yyyy = today.getFullYear();
+
+  today = mmmm + " " + dd + ", " + yyyy;
+  return today;
+}
+
 /*
 window.onload = function () {
     var btn = document.getElementById("testing");

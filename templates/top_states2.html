@@ -66,9 +66,9 @@
   div.setAttribute("id", "div"+x);
   //div.setAttribute("style","border: 4px solid");
   if( "{{category}}" == "cases") {
-    div.setAttribute("style", "background-color: rgba(255,87,51, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px"); //orange cases
+    div.setAttribute("style", "background-color: rgba(255,87,51, 0.06); border: 1px solid rgb(197, 56, 24); border-radius:10px"); //orange cases
   } else {
-    div.setAttribute("style", "background-color: rgba(144, 12, 63, 0.06); border: 1px solid rgb(200,200,200); border-radius:10px"); //burgundy deaths
+    div.setAttribute("style", "background-color: rgba(144, 12, 63, 0.06); border: 1px solid rgb(144,12,62); border-radius:10px"); //burgundy deaths
   }
   div.setAttribute("class","mt-4 mb-4");
   main.appendChild(div);
@@ -77,9 +77,12 @@
   div_state.setAttribute("id", "div_state_"+x);
   //div_state.setAttribute("style","border: 1px solid;");
   if( "{{category}}" == "cases") {
-    div_state.setAttribute("style","background-color: rgb(255,87,51); border-radius:10px");  //orange cases
+    //div_state.setAttribute("style","background-color: rgb(197, 56, 24); border-radius:10px");  //orange cases
+    div_state.setAttribute("style","border-radius:10px");  //no color
   } else {
     div_state.setAttribute("style","background-color: rgb(144,12,62); border-radius:10px"); //burgundy deaths
+    div_state.setAttribute("style","border-radius:10px"); //burgundy deaths
+
   }
   div_state.setAttribute("class","row border-bottom mr-0 ml-0");
   div.appendChild(div_state);
@@ -87,9 +90,13 @@
   var state_name = document.createElement("h2");
   state_name.setAttribute("id", "st_name"+x);
   state_name.innerHTML = x+1+"|    " +states_list[x].toUpperCase();
-  state_name.setAttribute("style", "color: rgb(85, 41, 116);");
-  state_name.setAttribute("style", "color: rgb(255, 255, 240);");
-  state_name.setAttribute("class","col pt-2 ml-2 font-weight-light");
+  if( "{{category}}" == "cases") {
+    state_name.setAttribute("style", "color: rgb(197, 56, 24);");
+  }
+  else {
+    state_name.setAttribute("style", "color: rgb(144,12,62);");
+  }
+  state_name.setAttribute("class","col pt-2 ml-2 font-weight-normal");
   div_state.appendChild(state_name);
 
   var div_img = document.createElement("div");

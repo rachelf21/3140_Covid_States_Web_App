@@ -1,1 +1,23 @@
-{% extends "base.html" %} {%block title%} Covid19 Charts {%endblock%} {%block content%} home page delete this {%endblock%}
+{% extends "base.html" %} {%block title%} Covid19 Charts {%endblock%} {%block content%}
+
+<div style="text-align: center;">
+  <h1 class="mb-4 font-weight-light">
+    Today is
+    <script>
+      document.onload = document.write(todaysDate() + ".");
+    </script>
+  </h1>
+  <h4 class="font-weight-light pt-4">
+    Total <span class="font-weight-normal" style="color: rgb(255, 87, 51);">Covid19 Cases</span> in the United States
+  </h4>
+  <h1 class="font-weight-normal pb-4" style="color: rgb(255, 87, 51);">{{usa_total_cases}}</h1>
+  <h4 class="font-weight-light pt-4">
+    Total <span class="font-weight-normal" style="color: rgb(144, 12, 62);">Covid19 Deaths</span> in the United States
+  </h4>
+  <h1 class="font-weight-normal pt-0" style="color: rgb(144, 12, 62);">{{usa_total_deaths}}</h1>
+
+  <h1 class="font-weight-normal pt-0" style="color: rgb(197, 56, 24);">{{usa_total_deaths}}</h1>
+</div>
+<p></p>
+<hr class="mt-4" />
+{%endblock%}

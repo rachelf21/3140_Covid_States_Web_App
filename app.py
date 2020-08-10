@@ -14,6 +14,8 @@ max_3_cases=[]
 max_3_deaths=[]
 max_cases = []
 max_deaths = []
+usa_total_cases = 0
+usa_total_deaths = 0
 curr_date = ''
 top = 3
 
@@ -49,7 +51,7 @@ usa_increase_deaths = usa_increase_cases = 0
 curr_date = ''
 
 def get_usa_data():
-    global usa_increase_cases, usa_increase_deaths
+    global usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths
     usa_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv", error_bad_lines=False)
     usa_data['date'] = pd.to_datetime(usa_data['date'], format="%Y-%m-%d" )
     usa_data['date'] = usa_data['date'].dt.date
@@ -58,6 +60,8 @@ def get_usa_data():
     usa_increase_deaths = '{:,.0f}'.format(usa_data['death_increase'].iloc[-1])
     usa_increase_cases = '{:,.0f}'.format(usa_data['case_increase'].iloc[-1])
     curr_date = usa_data['date'].iloc[-1]
+    usa_total_cases = '{:,.0f}'.format(usa_data['cases'].iloc[-1])
+    usa_total_deaths = '{:,.0f}'.format(usa_data['deaths'].iloc[-1])
     print("retrieving USA data")
     return usa_data
 
@@ -264,6 +268,10 @@ def get_state():
 def states_page():
     return render_template('select_state.html')    
 
+@app.route('/choose_source')
+def choose_source():
+    return render_template('data.html')   
+
 @app.route('/about.html')
 def about():
     return render_template('about.html')   
@@ -305,15 +313,11 @@ def form(category):
 
 @app.route('/')
 def index():
-    global graphJSON_usa_cases, graphJSON_usa_deaths;
-    graphJSON_usa_cases="[]"
-    graphJSON_usa_deaths="[]"
+    global usa_total_cases, usa_total_deaths;
     create_usa_chart(my_data=get_usa_data())
-    return render_template('usa.html', 
-                           graphJSON_usa_cases=graphJSON_usa_cases, 
-                           graphJSON_usa_deaths=graphJSON_usa_deaths,
-                           usa_increase_deaths = usa_increase_deaths,
-                           usa_increase_cases = usa_increase_cases,
+    return render_template('index.html', 
+                           usa_total_deaths = usa_total_deaths,
+                           usa_total_cases = usa_total_cases,
                            curr_date = curr_date)
 
 

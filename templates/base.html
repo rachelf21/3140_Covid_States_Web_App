@@ -32,7 +32,7 @@
     <!--script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script-->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/scripts.js')}}"></script>
-    <!--script type="text/javascript" src="/static/js/scripts.js"></script-->
+    <!-- <script type="text/javascript" src="/static/js/scripts.js"></script -->
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css')}}" media="all" />
@@ -120,7 +120,8 @@
               </form> -->
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Choose data source</a>
+              <!-- <a class="nav-link dropdown-toggle" id="navbarDropdown" href= "/choose_source" role="button" data-toggle="dropdown">Choose data source</a> -->
+              <a class="nav-link" href= "/choose_source" role="button" >Choose data source</a>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">NY Times</a>
                 <a class="dropdown-item" href="#">Covid Tracking Project</a>
