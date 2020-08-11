@@ -145,10 +145,7 @@ def create_states2_chart(my_data=get_states_data(selected_state, starting_date))
         opacity = .95
         )
     data = [trace_states_deaths]
-    graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-
-    #print("generating states2or3 chart")
-    
+    graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)   
     return graphJSON_states2_cases, graphJSON_states2_deaths
 
     
@@ -242,7 +239,6 @@ def get_max(category):
                                max_3_cases = max_3_cases,
                                max_3_deaths = max_3_deaths)
 
-
 @app.route('/SomeFunction')
 def SomeFunction():
     print('In SomeFunction')
@@ -308,9 +304,6 @@ def form(category):
         flash('Login Unsuccessful. Please check username and password', 'danger')
         return render_template('form.html', title='Select Top States', form=form, category=category)
 
-
-
-
 @app.route('/')
 def index():
     global usa_total_cases, usa_total_deaths;
@@ -320,6 +313,5 @@ def index():
                            usa_total_cases = usa_total_cases,
                            curr_date = curr_date)
 
-
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(debug=False)

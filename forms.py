@@ -12,5 +12,3 @@ class Top_States_Form(FlaskForm):
     starting_date = DateField('Starting Date', format="%Y-%m-%d",validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-#https://mrl33h.de/post/21
-#https://github.com/CoreyMSchafer/code_snippets/tree/master/Python/Flask_Blog/03-Forms-and-Validation
