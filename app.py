@@ -10,8 +10,6 @@ from forms import Top_States_Form
 user_state = ""
 selected_state = "California"
 starting_date = datetime(2020, 3, 1).date()
-max_3_cases=[]
-max_3_deaths=[]
 max_cases = []
 max_deaths = []
 usa_total_cases = 0
@@ -38,10 +36,6 @@ graphJSON_usa_cases="[]"
 graphJSON_usa_deaths="[]"
 graphJSON_states_cases="[]"
 graphJSON_states_deaths="[]"
-graphJSON_states2_cases="[]"
-graphJSON_states2_deaths="[]"
-graphJSON_states3_cases="[]"
-graphJSON_states3_deaths="[]"
 states = []
 df_states = []
 data_cases = []
@@ -301,7 +295,7 @@ def form(category):
                            max_3_deaths = max_3_deaths,
                            category=category)
     else:
-        flash('Login Unsuccessful. Please check username and password', 'danger')
+        flash('Invalid entry.', 'danger')
         return render_template('form.html', title='Select Top States', form=form, category=category)
 
 @app.route('/')
@@ -314,4 +308,4 @@ def index():
                            curr_date = curr_date)
 
 if __name__ == '__main__':
-  app.run(debug=False)
+  app.run(debug = False)
