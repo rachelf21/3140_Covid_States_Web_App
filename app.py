@@ -44,6 +44,7 @@ st_increase_deaths = st_increase_cases = 0
 usa_increase_deaths = usa_increase_cases = 0
 curr_date = ''
 
+#1
 def get_usa_data():
     global usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths
     usa_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv", error_bad_lines=False)
@@ -59,9 +60,8 @@ def get_usa_data():
     print("retrieving USA data")
     return usa_data
 
-usa_data = get_usa_data()
-
-def get_states_data(state, starting_date): # add st_date as second parameter
+#2
+def get_states_data(state, starting_date): 
     global st_increase_deaths, st_increase_cases, curr_date
     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
     states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
@@ -79,6 +79,7 @@ def get_states_data(state, starting_date): # add st_date as second parameter
 
 stdata=get_states_data(selected_state, starting_date)
 
+#3
 def get_max_increase(category):
     global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date, df_states
     max_3_cases=[]
@@ -119,6 +120,7 @@ def get_max_increase(category):
 max_cases = get_max_increase("cases")    
 max_deaths = get_max_increase("deaths")    
 
+#4
 def create_states2_chart(my_data=get_states_data(selected_state, starting_date)): 
     global graphJSON_states2_cases, graphJSON_states2_deaths
     
@@ -146,7 +148,7 @@ def create_states2_chart(my_data=get_states_data(selected_state, starting_date))
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
-
+#5
 @app.route('/get_usa_chart/')
 def create_usa_chart(my_data=get_usa_data()): 
     global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases
@@ -177,7 +179,7 @@ def create_usa_chart(my_data=get_usa_data()):
                            usa_increase_cases = usa_increase_cases,
                            curr_date = curr_date)
 
-
+#SKIP THIS ONE
 @app.route('/get_states_chart/')  #this route is note being used but the function is
 def create_states_chart(my_data=get_states_data(selected_state, starting_date)): 
     global graphJSON_states_cases, graphJSON_states_deaths
@@ -203,7 +205,7 @@ def create_states_chart(my_data=get_states_data(selected_state, starting_date)):
     print("generating states chart")
     return render_template('index.html',  graphJSON_states_cases=graphJSON_states_cases, graphJSON_states_deaths=graphJSON_states_deaths)
 
-
+#6
 @app.route('/get_max/<category>')
 def get_max(category):
     global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states
@@ -238,6 +240,7 @@ def SomeFunction():
     print('In SomeFunction')
     return "Nothing"
 
+#7
 @app.route('/get_state', methods=['POST'])
 def get_state():
     global user_state
@@ -271,6 +274,7 @@ def choose_top():
     print("testing choose top function")
     return redirect('/')
 
+#8
 @app.route('/form/<category>', methods=['GET', 'POST'])
 def form(category):
     global top, starting_date #fix starting_date later
@@ -291,8 +295,6 @@ def form(category):
                            curr_date = curr_date,
                            max_cases = max_cases,
                            max_deaths = max_deaths,
-                           max_3_cases = max_3_cases,
-                           max_3_deaths = max_3_deaths,
                            category=category)
     else:
         flash('Invalid entry.', 'danger')
@@ -301,7 +303,8 @@ def form(category):
 @app.route('/')
 def index():
     global usa_total_cases, usa_total_deaths;
-    create_usa_chart(my_data=get_usa_data())
+    #create_usa_chart(my_data=get_usa_data())
+    get_usa_data()
     return render_template('index.html', 
                            usa_total_deaths = usa_total_deaths,
                            usa_total_cases = usa_total_cases,
