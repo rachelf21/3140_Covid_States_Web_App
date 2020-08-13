@@ -7,8 +7,9 @@ import plotly
 import plotly.graph_objs as go
 from forms import Top_States_Form
 from data_sources import DataSourceCTP, DataSourceNYT, DataSourceOWID
+from state_abbrev import State_Abbrev
 
-
+info = DataSourceNYT()
 data_source = 'New York Times'
 logo = ""
 curr_date = ''
@@ -20,6 +21,11 @@ usa_increase_deaths = 0
 usa_increase_cases = 0
 
 ##GLOBAL STATE VARIABLES
+state_total_cases = 0
+state_total_deaths = 0
+state_increase_cases = 0
+state_increase_deaths = 0
+#go through these:
 user_state = ""
 selected_state = "California"
 starting_date = datetime(2020, 3, 1).date()
@@ -33,8 +39,6 @@ states = []
 df_states = []
 data_cases = []
 data_deaths = []
-st_increase_deaths = 0
-st_increase_cases = 0
 top = 3
 
 ##COLOR SCHEME
@@ -60,7 +64,7 @@ app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 #1  DONE
 def get_usa_data():
-    global data_source, usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths, curr_date, logo
+    global data_source, usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths, curr_date, logo, info
     
     if data_source == 'Covid Tracking Project':
         info = DataSourceCTP()
@@ -113,23 +117,57 @@ def create_chart(dates, values, my_color, my_opacity ):
 
 
 #2  WORK ON THIS NEXT
-def get_states_data(state, starting_date): 
-    global st_increase_deaths, st_increase_cases, curr_date
-    states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
-    states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
-    states_data['date'] = states_data['date'].dt.date
-    st = state
-    states_data = states_data[states_data.state==st]
-    states_data['case_increase']=(states_data.cases - states_data.cases.shift(1))
-    states_data['death_increase']=(states_data.deaths - states_data.deaths.shift(1))
-    st_increase_deaths = '{:,.0f}'.format(states_data['death_increase'].iloc[-1])
-    st_increase_cases = '{:,.0f}'.format(states_data['case_increase'].iloc[-1])
-    curr_date = states_data['date'].iloc[-1]   
-    #print("retrieving states data")
-    states_data = states_data[states_data.date >= starting_date]
-    return states_data
+def get_states_data(state, starting_date):
+    global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, state_total_cases,state_total_deaths, info
+    
+    if info.data_source_id == 2:
+        state = State_Abbrev().get_abbrev(state)
+    elif info.data_source_id == 3:
+        info = DataSourceNYT() #no states data from OWID
 
+    info.retrieve_data_state(state)
+    data_source = info.data_source_name
+    state_total_cases = info.state_total_cases
+    state_total_deaths = info.state_total_deaths
+    state_increase_cases = info.state_increase_cases
+    state_increase_deaths = info.state_increase_deaths
+
+    curr_date = info.latest_date
+    logo = info.logo
+    return info
+    
 stdata=get_states_data(selected_state, starting_date)
+
+#4
+def create_states2_chart(): 
+    global graphJSON_states2_cases, graphJSON_states2_deaths, info
+    
+    info = get_states_data(selected_state, starting_date)       
+    graphJSON_states2_cases = create_chart(info.state_dates, info.state_cases, orange, .95) 
+    graphJSON_states2_deaths = create_chart(info.state_dates, info.state_deaths, burgundy, .95)
+    
+    return graphJSON_states2_cases, graphJSON_states2_deaths
+
+
+#7
+@app.route('/get_state', methods=['GET', 'POST'])
+def get_state():
+    global selected_state
+    selected_state = request.form['state']
+    graphJSON_states_cases, graphJSON_states_deaths = create_states2_chart()
+    print("User selected state: ", selected_state)
+    return render_template('select_state.html',  
+                           selected_state = selected_state, 
+                           graphJSON_states_cases = graphJSON_states_cases, 
+                           graphJSON_states_deaths = graphJSON_states_deaths,
+                           curr_date = curr_date,
+                           state_increase_deaths = state_increase_deaths,
+                           state_increase_cases = state_increase_cases,
+                           logo = logo,
+                           data_source = data_source
+                           )
+
+
 
 #3
 def get_max_increase(category):
@@ -171,33 +209,6 @@ def get_max_increase(category):
     
 max_cases = get_max_increase("cases")    
 max_deaths = get_max_increase("deaths")    
-
-#4
-def create_states2_chart(my_data=get_states_data(selected_state, starting_date)): 
-    global graphJSON_states2_cases, graphJSON_states2_deaths
-    
-    trace_states_cases = go.Bar (
-        x = my_data.date,
-        y = my_data.case_increase,
-        marker_color = orange,
-        opacity = .95
-        )
-    data = [trace_states_cases]
-    
-    graphJSON_states2_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-
-    trace_states_deaths = go.Bar(
-        x = my_data.date,
-        y = my_data.death_increase,
-        marker_color = burgundy,
-        opacity = .95
-        )
-    data = [trace_states_deaths]
-    graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)   
-    return graphJSON_states2_cases, graphJSON_states2_deaths
-
-
-
 
 
 
@@ -257,22 +268,6 @@ def get_max(category):
                                max_3_cases = max_3_cases,
                                max_3_deaths = max_3_deaths)
 
-#7
-@app.route('/get_state', methods=['POST'])
-def get_state():
-    global user_state
-    user_state = request.form['state']
-    graphJSON_states_cases, graphJSON_states_deaths = create_states2_chart(my_data=get_states_data(user_state, starting_date))
-    print("User selected state: ", user_state)
-    selected_state = user_state
-    return render_template('select_state.html',  
-                           selected_state = selected_state, 
-                           graphJSON_states_cases=graphJSON_states_cases, 
-                           graphJSON_states_deaths=graphJSON_states_deaths,
-                           curr_date = curr_date,
-                           st_increase_deaths = st_increase_deaths,
-                           st_increase_cases = st_increase_cases,
-                           )
 
 # @app.route('/states_page')
 # def states_page():
@@ -314,13 +309,19 @@ def form(category):
 
 @app.route('/choose_source', methods=['GET', 'POST'])
 def choose_source():
-    global data_source
+    global data_source, info
     data_source = request.form['source']
+    if data_source == 'Covid Tracking Project':
+        info = DataSourceCTP()
+    elif data_source == 'Our World in Data':
+        info = DataSourceOWID()
+    else:
+        info = DataSourceNYT()
     print("Source: ", data_source)
     print("Request referrer", request.referrer)
-    return redirect(request.referrer)
+    return redirect(request.referrer) #! this does not work when on select_state page. do more research
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     # global usa_total_cases, usa_total_deaths, data_source
     get_usa_data()
