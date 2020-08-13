@@ -46,7 +46,7 @@ stop = timeit.default_timer()
 print('Time json2: {:.2f}'.format(stop - start))
             
             
-# LOADING DATA WITH pandas
+# #LOADING DATA WITH pandas
 
 # start = timeit.default_timer()
 

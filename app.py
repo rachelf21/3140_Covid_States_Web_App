@@ -6,17 +6,38 @@ from datetime import datetime, timedelta
 import plotly 
 import plotly.graph_objs as go
 from forms import Top_States_Form
+from data_sources import DataSourceCTP, DataSourceNYT, DataSourceOWID
 
+
+data_source = 'New York Times'
+logo = ""
+curr_date = ''
+
+##GLOBAL USA VARIABLES
+usa_total_cases = 0
+usa_total_deaths = 0
+usa_increase_deaths = 0
+usa_increase_cases = 0
+
+##GLOBAL STATE VARIABLES
 user_state = ""
 selected_state = "California"
 starting_date = datetime(2020, 3, 1).date()
 max_cases = []
 max_deaths = []
-usa_total_cases = 0
-usa_total_deaths = 0
-curr_date = ''
+graphJSON_usa_cases="[]"
+graphJSON_usa_deaths="[]"
+graphJSON_states_cases="[]"
+graphJSON_states_deaths="[]"
+states = []
+df_states = []
+data_cases = []
+data_deaths = []
+st_increase_deaths = 0
+st_increase_cases = 0
 top = 3
 
+##COLOR SCHEME
 color1 = 'rgb(56,83,93)'
 color2 = 'rgb(61,116,137)'
 color3 = 'rgb(67,149,179)'
@@ -32,35 +53,66 @@ red = 'rgb(199,0,57)'
 orange = 'rgb(255,87,51)'
 yellow = 'rgb(255,195,0)'
 
-graphJSON_usa_cases="[]"
-graphJSON_usa_deaths="[]"
-graphJSON_states_cases="[]"
-graphJSON_states_deaths="[]"
-states = []
-df_states = []
-data_cases = []
-data_deaths = []
-st_increase_deaths = st_increase_cases = 0
-usa_increase_deaths = usa_increase_cases = 0
-curr_date = ''
+    
+app = Flask(__name__)
+app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
-#1
+
+#1  DONE
 def get_usa_data():
-    global usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths
-    usa_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv", error_bad_lines=False)
-    usa_data['date'] = pd.to_datetime(usa_data['date'], format="%Y-%m-%d" )
-    usa_data['date'] = usa_data['date'].dt.date
-    usa_data['case_increase']=(usa_data.cases - usa_data.cases.shift(1))
-    usa_data['death_increase']=(usa_data.deaths - usa_data.deaths.shift(1))
-    usa_increase_deaths = '{:,.0f}'.format(usa_data['death_increase'].iloc[-1])
-    usa_increase_cases = '{:,.0f}'.format(usa_data['case_increase'].iloc[-1])
-    curr_date = usa_data['date'].iloc[-1]
-    usa_total_cases = '{:,.0f}'.format(usa_data['cases'].iloc[-1])
-    usa_total_deaths = '{:,.0f}'.format(usa_data['deaths'].iloc[-1])
-    print("retrieving USA data")
-    return usa_data
+    global data_source, usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths, curr_date, logo
+    
+    if data_source == 'Covid Tracking Project':
+        info = DataSourceCTP()
+    elif data_source == 'Our World in Data':
+        info = DataSourceOWID()
+    else:
+        info = DataSourceNYT()
+        
+    info.retrieve_data_usa()
+    data_source = info.data_source_name
+    usa_increase_cases = info.usa_increase_cases
+    usa_increase_deaths = info.usa_increase_deaths
+    usa_total_cases = info.usa_total_cases
+    usa_total_deaths = info.usa_total_deaths
+    curr_date = info.latest_date
+    logo = info.logo
+    return info
 
-#2
+#5  DONE
+@app.route('/get_usa_chart/')
+def create_usa_chart():
+    global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases
+
+    info = get_usa_data()
+    data_source = info.data_source_name
+    
+    graphJSON_usa_cases = create_chart(info.usa_dates, info.usa_cases, orange, .95)
+    graphJSON_usa_deaths = create_chart(info.usa_dates, info.usa_deaths, burgundy, .95)
+ 
+    print("Generating usa charts with data from", data_source)
+    return render_template('usa.html',  
+                           graphJSON_usa_cases=graphJSON_usa_cases, 
+                           graphJSON_usa_deaths=graphJSON_usa_deaths,
+                           usa_increase_deaths = usa_increase_deaths,
+                           usa_increase_cases = usa_increase_cases,
+                           curr_date = curr_date,
+                           data_source = data_source,
+                           logo = logo)
+
+#NEW FUNCTION TO TAKE x and y data as arguments and return json string to then pass on to plotly  DONE
+def create_chart(dates, values, my_color, my_opacity ):
+    trace_data = go.Bar(
+        x = dates,
+        y = values,
+        marker_color = my_color,
+        opacity = my_opacity)
+    data = [trace_data]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    return graphJSON
+
+
+#2  WORK ON THIS NEXT
 def get_states_data(state, starting_date): 
     global st_increase_deaths, st_increase_cases, curr_date
     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
@@ -144,40 +196,10 @@ def create_states2_chart(my_data=get_states_data(selected_state, starting_date))
     graphJSON_states2_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)   
     return graphJSON_states2_cases, graphJSON_states2_deaths
 
-    
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
-#5
-@app.route('/get_usa_chart/')
-def create_usa_chart(my_data=get_usa_data()): 
-    global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases
-    
-    trace_usa_cases = go.Bar (
-        x = my_data.date,
-        y = my_data.case_increase,
-        marker_color = orange,
-        opacity = .95
-        )
-    data = [trace_usa_cases]
-    
-    graphJSON_usa_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    
-    trace_usa_deaths = go.Bar (
-        x = my_data.date,
-        y = my_data.death_increase,
-        marker_color = burgundy,
-        opacity = .95
-        )
-    data = [trace_usa_deaths]
-    graphJSON_usa_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-     
-    print("generating usa chart")
-    return render_template('usa.html',  graphJSON_usa_cases=graphJSON_usa_cases, 
-                           graphJSON_usa_deaths=graphJSON_usa_deaths,
-                           usa_increase_deaths = usa_increase_deaths,
-                           usa_increase_cases = usa_increase_cases,
-                           curr_date = curr_date)
+
+
+
 
 #SKIP THIS ONE
 @app.route('/get_states_chart/')  #this route is note being used but the function is
@@ -235,11 +257,6 @@ def get_max(category):
                                max_3_cases = max_3_cases,
                                max_3_deaths = max_3_deaths)
 
-@app.route('/SomeFunction')
-def SomeFunction():
-    print('In SomeFunction')
-    return "Nothing"
-
 #7
 @app.route('/get_state', methods=['POST'])
 def get_state():
@@ -257,22 +274,16 @@ def get_state():
                            st_increase_cases = st_increase_cases,
                            )
 
-@app.route('/states_page')
-def states_page():
-    return render_template('select_state.html')    
+# @app.route('/states_page')
+# def states_page():
+#     return render_template('select_state.html')    
 
-@app.route('/choose_source')
-def choose_source():
-    return render_template('data.html')   
+ 
 
-@app.route('/about.html')
-def about():
-    return render_template('about.html')   
-
-@app.route('/choose_top', methods=['GET', 'POST'])
-def choose_top():
-    print("testing choose top function")
-    return redirect('/')
+# @app.route('/choose_top', methods=['GET', 'POST'])
+# def choose_top():
+#     print("testing choose top function")
+#     return redirect('/')
 
 #8
 @app.route('/form/<category>', methods=['GET', 'POST'])
@@ -300,15 +311,30 @@ def form(category):
         flash('Invalid entry.', 'danger')
         return render_template('form.html', title='Select Top States', form=form, category=category)
 
+
+@app.route('/choose_source', methods=['GET', 'POST'])
+def choose_source():
+    global data_source
+    data_source = request.form['source']
+    print("Source: ", data_source)
+    print("Request referrer", request.referrer)
+    return redirect(request.referrer)
+
 @app.route('/')
 def index():
-    global usa_total_cases, usa_total_deaths;
-    #create_usa_chart(my_data=get_usa_data())
+    # global usa_total_cases, usa_total_deaths, data_source
     get_usa_data()
     return render_template('index.html', 
                            usa_total_deaths = usa_total_deaths,
                            usa_total_cases = usa_total_cases,
-                           curr_date = curr_date)
+                           curr_date = curr_date,
+                           data_source = data_source,
+                           logo = logo
+                           )
+
+@app.route('/about.html')
+def about():
+    return render_template('about.html')  
 
 if __name__ == '__main__':
   app.run(debug = False)
