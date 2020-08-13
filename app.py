@@ -10,9 +10,10 @@ from data_sources import DataSourceCTP, DataSourceNYT, DataSourceOWID
 from state_abbrev import State_Abbrev
 
 info = DataSourceNYT()
-data_source = 'New York Times'
-logo = ""
-curr_date = ''
+data_source = info.data_source_name
+logo = info.logo
+print("logo ", logo)
+curr_date = info.latest_date
 
 ##GLOBAL USA VARIABLES
 usa_total_cases = 0
@@ -36,7 +37,7 @@ graphJSON_usa_deaths="[]"
 graphJSON_states_cases="[]"
 graphJSON_states_deaths="[]"
 states = []
-df_states = []
+df_states = [] #replaced with states_current
 data_cases = []
 data_deaths = []
 top = 3
@@ -116,14 +117,14 @@ def create_chart(dates, values, my_color, my_opacity ):
     return graphJSON
 
 
-#2  WORK ON THIS NEXT
+#2 DONE
 def get_states_data(state, starting_date):
-    global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, state_total_cases,state_total_deaths, info
+    global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, info, state_total_cases,state_total_deaths
     
-    if info.data_source_id == 2:
+    if info.data_source_id == 2 and len(selected_state)>3:
         state = State_Abbrev().get_abbrev(state)
-    elif info.data_source_id == 3:
-        info = DataSourceNYT() #no states data from OWID
+    # elif info.data_source_id == 3:
+    #     info = DataSourceNYT() #no states data from OWID
 
     info.retrieve_data_state(state)
     data_source = info.data_source_name
@@ -134,14 +135,16 @@ def get_states_data(state, starting_date):
 
     curr_date = info.latest_date
     logo = info.logo
+    print("INFO =", info.data_source_name)
     return info
     
 stdata=get_states_data(selected_state, starting_date)
 
 #4
 def create_states2_chart(): 
-    global graphJSON_states2_cases, graphJSON_states2_deaths, info
-    
+    global graphJSON_states2_cases, graphJSON_states2_deaths, info, selected_state
+    print("INFO=", info.data_source_name)
+    print("selected_state=", selected_state)
     info = get_states_data(selected_state, starting_date)       
     graphJSON_states2_cases = create_chart(info.state_dates, info.state_cases, orange, .95) 
     graphJSON_states2_deaths = create_chart(info.state_dates, info.state_deaths, burgundy, .95)
@@ -169,46 +172,46 @@ def get_state():
 
 
 
-#3
-def get_max_increase(category):
-    global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date, df_states
-    max_3_cases=[]
-    max_3_deaths=[]
-    states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
-    states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
-    states_data['date'] = states_data['date'].dt.date
-    states_data.sort_values(by=['date','state'], inplace=True, ascending=False)
-    curr_date = states_data[['date']].values[0][0]
-    yest_date = curr_date - timedelta(days=1)
-    states_latest = states_data[states_data.date==curr_date]  
-    states_yest =  states_data[states_data.date==yest_date]
-    states_latest = states_latest.append(states_yest, ignore_index=True)
-    df = states_latest.assign(cases_increase=0)
-    df = states_latest.assign(deaths_increase=0)    
-    df.sort_values(by=['state','date'],inplace=True)
-    mask = df.duplicated(['state'])
-    df['cases_increase'] = np.where(mask, df['cases']-df['cases'].shift(1), np.nan)
-    df['deaths_increase'] = np.where(mask, df['deaths']-df['deaths'].shift(1), np.nan)
-    if(category=="cases"): #cases
-        print(category, "max cases")
-        df.sort_values(by=['cases_increase'],inplace=True, ascending=False)
-        # for i in range(0,3):
-        #     max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
-        #     max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
-        # print("max cases = ", max_3_cases)
-    else: #deaths
-        print(category, "max deaths")
-        df.sort_values(by=['deaths_increase'],inplace=True, ascending=False)
-    for i in range(0,3):
-        max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
-        max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
-    df = df.reset_index(drop=True)
-    df_states = df.state[df.date==curr_date]
-    selected_state = df.state[0]
-    return df
+# #3
+# def get_max_increase(category):
+#     global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date, df_states
+#     max_3_cases=[]
+#     max_3_deaths=[]
+#     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
+#     states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
+#     states_data['date'] = states_data['date'].dt.date
+#     states_data.sort_values(by=['date','state'], inplace=True, ascending=False)
+#     curr_date = states_data[['date']].values[0][0]
+#     yest_date = curr_date - timedelta(days=1)
+#     states_latest = states_data[states_data.date==curr_date]  
+#     states_yest =  states_data[states_data.date==yest_date]
+#     states_latest = states_latest.append(states_yest, ignore_index=True)
+#     df = states_latest.assign(cases_increase=0)
+#     df = states_latest.assign(deaths_increase=0)    
+#     df.sort_values(by=['state','date'],inplace=True)
+#     mask = df.duplicated(['state'])
+#     df['cases_increase'] = np.where(mask, df['cases']-df['cases'].shift(1), np.nan)
+#     df['deaths_increase'] = np.where(mask, df['deaths']-df['deaths'].shift(1), np.nan)
+#     if(category=="cases"): #cases
+#         print(category, "max cases")
+#         df.sort_values(by=['cases_increase'],inplace=True, ascending=False)
+#         # for i in range(0,3):
+#         #     max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
+#         #     max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
+#         # print("max cases = ", max_3_cases)
+#     else: #deaths
+#         print(category, "max deaths")
+#         df.sort_values(by=['deaths_increase'],inplace=True, ascending=False)
+#     for i in range(0,3):
+#         max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
+#         max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
+#     df = df.reset_index(drop=True)
+#     df_states = df.state[df.date==curr_date]
+#     selected_state = df.state[0]
+#     return df
     
-max_cases = get_max_increase("cases")    
-max_deaths = get_max_increase("deaths")    
+# max_cases = get_max_increase("cases")    
+# max_deaths = get_max_increase("deaths")    
 
 
 
@@ -241,20 +244,29 @@ def create_states_chart(my_data=get_states_data(selected_state, starting_date)):
 #6
 @app.route('/get_max/<category>')
 def get_max(category):
-    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states
+    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top
     data_cases=[]
     data_deaths=[]
     states = []
     
-    df = get_max_increase(category)  #returns df database - used for sorting purposes
-    max_cases = list(df['cases_increase'][df.date==curr_date])
-    max_deaths = list(df['deaths_increase'][df.date==curr_date])
-      
+    # df = get_max_increase(category)  #returns df database - used for sorting purposes
+    # max_cases = list(df['cases_increase'][df.date==curr_date])
+    # max_deaths = list(df['deaths_increase'][df.date==curr_date])
+    #info = DataSourceCTP()
+    info.retrieve_current_states()
+
+    if category == 'cases':
+        states, max_cases, max_deaths = info.get_max_cases()
+    else:
+        states, max_deaths, max_cases = info.get_max_deaths()
+        print("info.get_max_deaths *****************")
+        
     for i in range(top):
-        state = df_states[i]
-        states.append(state)
-        #print("state", state)
-        graph_cases, graph_deaths = create_states2_chart(my_data=get_states_data(state, starting_date))
+        print(top)
+        selected_state = states[i]
+        #states.append(state)
+        print("state", selected_state)
+        graph_cases, graph_deaths = create_states2_chart()
         data_cases.append(graph_cases)
         data_deaths.append(graph_deaths)
         
@@ -263,17 +275,10 @@ def get_max(category):
                                data_cases = data_cases,
                                data_deaths = data_deaths,
                                curr_date = curr_date,
-                               max_cases = max_cases,
-                               max_deaths = max_deaths,
-                               max_3_cases = max_3_cases,
-                               max_3_deaths = max_3_deaths)
-
-
+                               logo = logo)
 # @app.route('/states_page')
 # def states_page():
 #     return render_template('select_state.html')    
-
- 
 
 # @app.route('/choose_top', methods=['GET', 'POST'])
 # def choose_top():
@@ -283,7 +288,7 @@ def get_max(category):
 #8
 @app.route('/form/<category>', methods=['GET', 'POST'])
 def form(category):
-    global top, starting_date #fix starting_date later
+    global top, starting_date, data_cases, data_deaths #fix starting_date later
     form = Top_States_Form()
     #form.amount.data = 3
     form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
@@ -292,19 +297,28 @@ def form(category):
         top = form.amount.data
         st_date = form.starting_date.data 
         starting_date = st_date #quick fix for now. fix this later
-        print("Starting Date: ", st_date)
         get_max(category)
         return render_template('top_states2.html', 
                            states = states,
+                           logo = logo,
+                           data_source = data_source,
                            data_cases = data_cases,
                            data_deaths = data_deaths,
                            curr_date = curr_date,
                            max_cases = max_cases,
                            max_deaths = max_deaths,
-                           category=category)
+                           category=category,
+                           )
     else:
         flash('Invalid entry.', 'danger')
-        return render_template('form.html', title='Select Top States', form=form, category=category)
+        return render_template('form.html', 
+                               title='Select Top States', 
+                               form=form, 
+                               category=category,
+                               logo = logo,
+                               data_source = data_source,
+                               curr_date = curr_date,
+                               )
 
 
 @app.route('/choose_source', methods=['GET', 'POST'])
