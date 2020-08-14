@@ -48,7 +48,7 @@
               <a class="mt-2 nav-link" href="/">Home</a>
             </li>
             <li></li>
-            <li class="nav-item mx-1 dropdown">
+            <li class="nav-item mx-1">
               <!-- <a class="nav-link dropdown-toggle" id="navbarDropdown" href= "/choose_source" role="button" data-toggle="dropdown">Choose data source</a> -->
               <!-- <a class="nav-link" href="/choose_source" role="button">Choose data source</a> -->
               <form class="form-inline nav-link dropdown-item" name="dataForm" action="{{ url_for('choose_source') }}" method="POST">
@@ -62,9 +62,10 @@
                   <option value="select">Select Data Source</option>
                   <option value="Covid Tracking Project">Covid Tracking Project</option>
                   <option value="New York Times">New York Times</option>
-                  <option value="Our World in Data">Our World in Data</option>
+                  <!--option value="Our World in Data">Our World in Data</option-->
                 </select>
               </form>
+              </script>
               <!-- <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">NY Times</a>
                 <a class="dropdown-item" href="#">Covid Tracking Project</a>

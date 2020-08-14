@@ -9,7 +9,7 @@ from forms import Top_States_Form
 from data_sources import DataSourceCTP, DataSourceNYT, DataSourceOWID
 from state_abbrev import State_Abbrev
 
-info = DataSourceNYT()
+info = DataSourceCTP()
 data_source = info.data_source_name
 logo = info.logo
 print("logo ", logo)
@@ -335,7 +335,7 @@ def form(category):
 
 @app.route('/choose_source', methods=['GET', 'POST'])
 def choose_source():
-    global data_source, info
+    global data_source, info, logo
     data_source = request.form['source']
     if data_source == 'Covid Tracking Project':
         info = DataSourceCTP()
@@ -343,8 +343,11 @@ def choose_source():
         info = DataSourceOWID()
     else:
         info = DataSourceNYT()
+    logo = info.logo
     print("Source: ", data_source)
     print("Request referrer", request.referrer)
+    if request.referrer == "http://127.0.0.1:5000/get_state":
+        return redirect(url_for("index"))
     return redirect(request.referrer) #! this does not work when on select_state page. do more research
 
 @app.route('/', methods=['GET', 'POST'])

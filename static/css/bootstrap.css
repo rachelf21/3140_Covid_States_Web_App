@@ -3639,14 +3639,14 @@ input[type="button"].btn-block {
 .dropdown-item:focus {
   color: #16181b;
   text-decoration: none;
-  background-color: #f8f9fa;
+  /*background-color: #f8f9fa;*/
 }
 
 .dropdown-item.active,
 .dropdown-item:active {
-  color: #fff;
+  /*color: #fff;*/
   text-decoration: none;
-  background-color: #4395b3;
+  /*background-color: #4395b3;*/
 }
 
 .dropdown-item.disabled,

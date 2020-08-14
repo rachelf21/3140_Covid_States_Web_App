@@ -210,7 +210,7 @@ class DataSourceCTP(DataSource):
             self.state_dates.clear()
             state_temp_dates = []
              
-            for info in self.usa_data:
+            for info in self.state_data:
                 self.state_cases.append(info['positiveIncrease'])
                 self.state_deaths.append(info['deathIncrease'])
                 state_temp_dates.append(str(info['date']))
@@ -256,9 +256,9 @@ class DataSourceOWID(DataSource):
 
 #%%
 nyt = DataSourceNYT()
-nyt.retrieve_current_states()
-a, b, c = nyt.get_max_deaths()
+nyt.retrieve_data_state("New York")
+
 
 ctp = DataSourceCTP()
-ctp.retrieve_current_states()
+ctp.retrieve_data_state("NY")
 
