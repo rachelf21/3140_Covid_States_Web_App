@@ -171,7 +171,7 @@ class DataSourceCTP(DataSource):
             max_deaths = []
             for item in self.states_current:
                 states.append(item['state'])
-                max_cases.append(item['positiveIncrease'])
+                max_cases.append("{:,.0f}".format((item['positiveIncrease'])))
                 max_deaths.append(item['deathIncrease'])
             return states, max_cases, max_deaths
     
@@ -183,7 +183,7 @@ class DataSourceCTP(DataSource):
             for item in self.states_current:
                 states.append(item['state'])
                 max_deaths.append(item['deathIncrease'])
-                max_cases.append(item['positiveIncrease'])
+                max_cases.append("{:,.0f}".format((item['positiveIncrease'])))
             return states, max_deaths, max_cases
             
     def retrieve_data_state(self,state):
