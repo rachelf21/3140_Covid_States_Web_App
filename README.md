@@ -105,3 +105,7 @@ Your app should now run on the Heroku server.
 ## Author
 
 - **Rachel Friedman** [View more of my work](https://github.com/rachelf21)
+
+[//]: # "![W3Validdator badge](https://img.shields.io/w3c-validation/html?style=plastic&targetUrl=https%3A%2F%2Fvalidator.w3.org%2F"
+
+![W3Validdator badge](https://heroku-badge.herokuapp.com/?app=cs3140-covid-web-app) ![Repo size](https://img.shields.io/github/repo-size/rachelf21/3140_Covid_States_Web_App?style=flat)

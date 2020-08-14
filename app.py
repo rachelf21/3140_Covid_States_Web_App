@@ -23,6 +23,7 @@ usa_increase_cases = 0
 
 ##GLOBAL STATE VARIABLES
 state_total_cases = 0
+states_total_cases = []
 state_total_deaths = 0
 state_increase_cases = 0
 state_increase_deaths = 0
@@ -244,7 +245,8 @@ def create_states_chart(my_data=get_states_data(selected_state, starting_date)):
 #6
 @app.route('/get_max/<category>')
 def get_max(category):
-    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top
+    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top, states_total_cases, info
+    states_total_cases = []
     data_cases=[]
     data_deaths=[]
     states = []
@@ -266,14 +268,22 @@ def get_max(category):
         selected_state = states[i]
         #states.append(state)
         print("state", selected_state)
+        states_total_cases.append(info.state_total_cases)
+        print(selected_state, "cases", info.state_total_cases)
         graph_cases, graph_deaths = create_states2_chart()
         data_cases.append(graph_cases)
         data_deaths.append(graph_deaths)
-        
+    
+    print("Data Source ID: ", info.data_source_id)
+    if info.data_source_id == 2:
+        for index, st in enumerate(states):
+            states[index] = State_Abbrev().get_full_name(st)
+            
     return render_template('top_states2.html', 
                                states = states,
                                data_cases = data_cases,
                                data_deaths = data_deaths,
+                               states_total_cases = states_total_cases,
                                curr_date = curr_date,
                                logo = logo)
 # @app.route('/states_page')
@@ -288,7 +298,7 @@ def get_max(category):
 #8
 @app.route('/form/<category>', methods=['GET', 'POST'])
 def form(category):
-    global top, starting_date, data_cases, data_deaths #fix starting_date later
+    global top, starting_date, data_cases, data_deaths, states_total_cases #fix starting_date later
     form = Top_States_Form()
     #form.amount.data = 3
     form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
@@ -298,6 +308,7 @@ def form(category):
         st_date = form.starting_date.data 
         starting_date = st_date #quick fix for now. fix this later
         get_max(category)
+        print("STATES TOTAL CASES" , states_total_cases)
         return render_template('top_states2.html', 
                            states = states,
                            logo = logo,
@@ -308,6 +319,7 @@ def form(category):
                            max_cases = max_cases,
                            max_deaths = max_deaths,
                            category=category,
+                           states_total_cases = states_total_cases, 
                            )
     else:
         flash('Invalid entry.', 'danger')

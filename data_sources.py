@@ -94,7 +94,7 @@ class DataSourceNYT(DataSource):
         df.sort_values(by=['state','date'],inplace=True)
         mask = df.duplicated(['state'])
         df['cases_increase'] = np.where(mask, df['cases']-df['cases'].shift(1), np.nan)
-        df['deaths_increase'] = np.where(mask, df['deaths']-df['deaths'].shift(1), np.nan)
+        df['deaths_increase'] = np.where(mask, df['deaths']-df['deaths'].shift(1), np.nan)       
         df.fillna(0, inplace=True)
         self.states_current = df
         

@@ -1,10 +1,23 @@
 {%extends "base.html"%} {%block title%} Covid19 by {{category}}{%endblock%} {% block content %}
-<div>
-  <h3 style="text-align: center;" class="font-weight-light border-bottom mb-4">
-    States currently reporting the greatest increase of
-    <span class="font-weight-normal" style="color: rgb(197, 56, 24);">{{category}}</span> for {{curr_date}}
-  </h3>
+
+<div id="outer" style="position: relative;">
+  <script>
+    var logo = document.createElement("img");
+    var image = "/static/img/logos/" + "{{logo}}" + "_logo.png";
+    logo.setAttribute("src", image);
+    logo.setAttribute("style", "height: 46px; border: 1px solid rgb(200,200,200); border-radius:10%; position: absolute; bottom: 0px;");
+    logo.setAttribute("class", "mr-3");
+    document.getElementById("outer").prepend(logo);
+  </script>
+
+  <div>
+    <h3 style="text-align: center;" class="font-weight-light border-bottom mb-4">
+      States currently reporting the greatest increase of
+      <span class="font-weight-normal" style="color: rgb(197, 56, 24);">{{category}}</span> for {{curr_date}}
+    </h3>
+  </div>
 </div>
+
 <div id="main">
   <div id="div_left" class="col"></div>
   <div id="div_right" class="col"></div>
@@ -16,6 +29,7 @@
   var max_cases = {{max_cases | safe}};
   var data_cases = {{data_cases | safe}};
   var data_deaths = {{data_deaths | safe}};
+  var states_total_cases = {{states_total_cases | safe}};
   console.log(data_deaths[0]);
 
   var msg_txs = "* On 7/27/20, Texas state health officials changed their method of reporting, adding deaths not previously reported.";
@@ -140,6 +154,28 @@
   div_stats.style.position = "relative";
   div_stats.style.height = "50px";
   div_cases_stats.appendChild(div_stats);
+
+  var div_total_cases = document.createElement("div");
+  div_total_cases.setAttribute("id", "div_total_cases");
+  div_total_cases.setAttribute("style", "position: relative; ");
+  div_total_cases.setAttribute("class", "col-6");
+  //div_stats.appendChild(div_total_cases);
+  //div_total_cases.setAttribute("style" , "border:2px solid");
+  var tot_cases = document.createElement("h2");
+  tot_cases.setAttribute("style", "text-align:right");
+  var t = document.createElement("h6")
+  t.innerHTML = "Total Cases:"
+  t.setAttribute("class", "ml-4 text-muted font-weight-light");
+  t.setAttribute("style", "position: absolute; bottom:0px;");
+
+  div_total_cases.appendChild(t);
+
+  tot_cases.innerHTML = states_total_cases[x];
+  tot_cases.setAttribute("class", "font-weight-light ml-auto");
+  //tot_cases.setAttribute("style", "text-align:right");
+  div_total_cases.appendChild(tot_cases);
+
+
   var div_stats01 = document.createElement("div");
   div_stats01.style.position = "absolute";
   div_stats01.style.bottom = "0";
