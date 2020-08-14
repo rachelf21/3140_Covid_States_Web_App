@@ -14,7 +14,7 @@ _There were many other items, but I used a different workflow and did not keep t
 _But from this point on, I'm updating it continuously._
 
 - [x] change abbreviation to full name for state flag images and state name
-- [ ] **fix redirect on select data source for cases/deaths/select pages**
+- [x] fix redirect on select data source for cases/deaths/select pages
 - [ ] data source in footer link to original data source
 - [x] fit data source in footer to fit in main window - adjust elements above
 - [ ] format total_cases with commas (nyt and ctp)
