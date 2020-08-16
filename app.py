@@ -1,19 +1,23 @@
 from flask import Flask, render_template, url_for, jsonify, request, redirect, flash
+import timeit
 import json
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
+import time
 import plotly 
 import plotly.graph_objs as go
 from forms import Top_States_Form
 from data_sources import DataSourceCTP, DataSourceNYT, DataSourceOWID
 from state_abbrev import State_Abbrev
 
-info = DataSourceCTP()
+testdates = []
+info = DataSourceNYT()
 data_source = info.data_source_name
 logo = info.logo
-print("logo ", logo)
 curr_date = info.latest_date
+link = ''
+button = 4
 
 ##GLOBAL USA VARIABLES
 usa_total_cases = 0
@@ -64,17 +68,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 
-#1  DONE
+#1  
 def get_usa_data():
-    global data_source, usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths, curr_date, logo, info
-    
-    if data_source == 'Covid Tracking Project':
-        info = DataSourceCTP()
-    elif data_source == 'Our World in Data':
-        info = DataSourceOWID()
-    else:
-        info = DataSourceNYT()
-        
+    global data_source, usa_increase_cases, usa_increase_deaths, usa_total_cases, usa_total_deaths, curr_date, logo, info, button
+            
+    button = 0
     info.retrieve_data_usa()
     data_source = info.data_source_name
     usa_increase_cases = info.usa_increase_cases
@@ -85,10 +83,10 @@ def get_usa_data():
     logo = info.logo
     return info
 
-#5  DONE
+#5 
 @app.route('/get_usa_chart/')
 def create_usa_chart():
-    global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases
+    global graphJSON_usa_cases, graphJSON_usa_deaths, usa_increase_deaths, usa_increase_cases, button
 
     info = get_usa_data()
     data_source = info.data_source_name
@@ -96,17 +94,17 @@ def create_usa_chart():
     graphJSON_usa_cases = create_chart(info.usa_dates, info.usa_cases, orange, .95)
     graphJSON_usa_deaths = create_chart(info.usa_dates, info.usa_deaths, burgundy, .95)
  
-    print("Generating usa charts with data from", data_source)
-    return render_template('usa.html',  
+    return render_template('usa.html', 
+                           button = button,
                            graphJSON_usa_cases=graphJSON_usa_cases, 
                            graphJSON_usa_deaths=graphJSON_usa_deaths,
                            usa_increase_deaths = usa_increase_deaths,
                            usa_increase_cases = usa_increase_cases,
                            curr_date = curr_date,
                            data_source = data_source,
-                           logo = logo)
+                           logo = logo,
+                           link = info.link)
 
-#NEW FUNCTION TO TAKE x and y data as arguments and return json string to then pass on to plotly  DONE
 def create_chart(dates, values, my_color, my_opacity ):
     trace_data = go.Bar(
         x = dates,
@@ -117,8 +115,7 @@ def create_chart(dates, values, my_color, my_opacity ):
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
-
-#2 DONE
+#2 
 def get_states_data(state, starting_date):
     global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, info, state_total_cases,state_total_deaths
     
@@ -128,39 +125,32 @@ def get_states_data(state, starting_date):
     #     info = DataSourceNYT() #no states data from OWID
 
     info.retrieve_data_state(state)
-    data_source = info.data_source_name
     state_total_cases = info.state_total_cases
     state_total_deaths = info.state_total_deaths
     state_increase_cases = info.state_increase_cases
     state_increase_deaths = info.state_increase_deaths
-
     curr_date = info.latest_date
     logo = info.logo
-    print("INFO =", info.data_source_name)
     return info
     
-stdata=get_states_data(selected_state, starting_date)
-
 #4
 def create_states2_chart(): 
     global graphJSON_states2_cases, graphJSON_states2_deaths, info, selected_state
-    print("INFO=", info.data_source_name)
-    print("selected_state=", selected_state)
     info = get_states_data(selected_state, starting_date)       
     graphJSON_states2_cases = create_chart(info.state_dates, info.state_cases, orange, .95) 
     graphJSON_states2_deaths = create_chart(info.state_dates, info.state_deaths, burgundy, .95)
     
     return graphJSON_states2_cases, graphJSON_states2_deaths
 
-
 #7
 @app.route('/get_state', methods=['GET', 'POST'])
 def get_state():
-    global selected_state
+    global selected_state, button
+    button = 3
     selected_state = request.form['state']
     graphJSON_states_cases, graphJSON_states_deaths = create_states2_chart()
-    print("User selected state: ", selected_state)
-    return render_template('select_state.html',  
+    return render_template('select_state.html', 
+                           button = button,
                            selected_state = selected_state, 
                            graphJSON_states_cases = graphJSON_states_cases, 
                            graphJSON_states_deaths = graphJSON_states_deaths,
@@ -168,150 +158,74 @@ def get_state():
                            state_increase_deaths = state_increase_deaths,
                            state_increase_cases = state_increase_cases,
                            logo = logo,
+                           link = info.link,
                            data_source = data_source
                            )
 
-
-
-# #3
-# def get_max_increase(category):
-#     global selected_state, selected_state2, selected_state3, max_3_cases, max_3_deaths, curr_date, df_states
-#     max_3_cases=[]
-#     max_3_deaths=[]
-#     states_data = pd.read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv", error_bad_lines=False)
-#     states_data['date'] = pd.to_datetime(states_data['date'], format="%Y-%m-%d" )
-#     states_data['date'] = states_data['date'].dt.date
-#     states_data.sort_values(by=['date','state'], inplace=True, ascending=False)
-#     curr_date = states_data[['date']].values[0][0]
-#     yest_date = curr_date - timedelta(days=1)
-#     states_latest = states_data[states_data.date==curr_date]  
-#     states_yest =  states_data[states_data.date==yest_date]
-#     states_latest = states_latest.append(states_yest, ignore_index=True)
-#     df = states_latest.assign(cases_increase=0)
-#     df = states_latest.assign(deaths_increase=0)    
-#     df.sort_values(by=['state','date'],inplace=True)
-#     mask = df.duplicated(['state'])
-#     df['cases_increase'] = np.where(mask, df['cases']-df['cases'].shift(1), np.nan)
-#     df['deaths_increase'] = np.where(mask, df['deaths']-df['deaths'].shift(1), np.nan)
-#     if(category=="cases"): #cases
-#         print(category, "max cases")
-#         df.sort_values(by=['cases_increase'],inplace=True, ascending=False)
-#         # for i in range(0,3):
-#         #     max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
-#         #     max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
-#         # print("max cases = ", max_3_cases)
-#     else: #deaths
-#         print(category, "max deaths")
-#         df.sort_values(by=['deaths_increase'],inplace=True, ascending=False)
-#     for i in range(0,3):
-#         max_3_cases.append('{:.0f}'.format(df.cases_increase.iloc[i]))
-#         max_3_deaths.append('{:.0f}'.format(df.deaths_increase.iloc[i]))
-#     df = df.reset_index(drop=True)
-#     df_states = df.state[df.date==curr_date]
-#     selected_state = df.state[0]
-#     return df
-    
-# max_cases = get_max_increase("cases")    
-# max_deaths = get_max_increase("deaths")    
-
-
-
-#SKIP THIS ONE
-@app.route('/get_states_chart/')  #this route is note being used but the function is
-def create_states_chart(my_data=get_states_data(selected_state, starting_date)): 
-    global graphJSON_states_cases, graphJSON_states_deaths
-    
-    trace_states_cases = go.Scatter (
-        x = my_data.date,
-        y = my_data.case_increase,
-        marker_color = orange,
-        opacity = .5
-        )
-    data = [trace_states_cases]
-    graphJSON_states_cases = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
-    
-    trace_states_deaths = go.Scatter (
-        x = my_data.date,
-        y = my_data.death_increase,
-        marker_color = purple,
-        opacity = .5
-        )
-    data = [trace_states_deaths]
-    graphJSON_states_deaths = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder) 
- 
-    print("generating states chart")
-    return render_template('index.html',  graphJSON_states_cases=graphJSON_states_cases, graphJSON_states_deaths=graphJSON_states_deaths)
-
-#6
 @app.route('/get_max/<category>')
 def get_max(category):
-    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top, states_total_cases, info
+    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top,button, states_total_cases, info
     states_total_cases = []
     data_cases=[]
     data_deaths=[]
-    states = []
-    
-    # df = get_max_increase(category)  #returns df database - used for sorting purposes
-    # max_cases = list(df['cases_increase'][df.date==curr_date])
-    # max_deaths = list(df['deaths_increase'][df.date==curr_date])
-    #info = DataSourceCTP()
+    states = []    
     info.retrieve_current_states()
 
     if category == 'cases':
+        button = 1
         states, max_cases, max_deaths = info.get_max_cases()
     else:
+        button = 2 
         states, max_deaths, max_cases = info.get_max_deaths()
-        print("info.get_max_deaths *****************")
-        
+    
+    start = timeit.default_timer()   
     for i in range(top):
-        print(top)
         selected_state = states[i]
         #states.append(state)
-        print("state", selected_state)
         states_total_cases.append(info.state_total_cases)
-        print(selected_state, "cases", info.state_total_cases)
+        # print(selected_state, "cases", info.state_total_cases)  #troubleshooting cases figure
         graph_cases, graph_deaths = create_states2_chart()
         data_cases.append(graph_cases)
         data_deaths.append(graph_deaths)
+        
+    stop = timeit.default_timer()
+    print('Retrieving each individual state data from', data_source, '{:.2f}'.format(stop-start))
     
-    print("Data Source ID: ", info.data_source_id)
     if info.data_source_id == 2:
         for index, st in enumerate(states):
             states[index] = State_Abbrev().get_full_name(st)
             
     return render_template('top_states2.html', 
+                               button = button,
                                states = states,
                                data_cases = data_cases,
                                data_deaths = data_deaths,
                                states_total_cases = states_total_cases,
                                curr_date = curr_date,
-                               logo = logo)
-# @app.route('/states_page')
-# def states_page():
-#     return render_template('select_state.html')    
-
-# @app.route('/choose_top', methods=['GET', 'POST'])
-# def choose_top():
-#     print("testing choose top function")
-#     return redirect('/')
+                               logo = logo,
+                               link = info.link)
 
 #8
 @app.route('/form/<category>', methods=['GET', 'POST'])
 def form(category):
-    global top, starting_date, data_cases, data_deaths, states_total_cases #fix starting_date later
-    form = Top_States_Form()
+    global top, button, starting_date, data_cases, data_deaths, states_total_cases #fix starting_date later
+    if category=="cases":
+        button = 1
+    else:
+        button = 2
+    form = Top_States_Form(request.form)
     #form.amount.data = 3
     form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
-    if form.is_submitted():
-        print("Form validated!")
+    if form.validate():
         top = form.amount.data
         st_date = form.starting_date.data 
         starting_date = st_date #quick fix for now. fix this later
         get_max(category)
-        print("STATES TOTAL CASES" , states_total_cases)
         return render_template('top_states2.html', 
                            states = states,
+                           button = button,
                            logo = logo,
+                           link = info.link,
                            data_source = data_source,
                            data_cases = data_cases,
                            data_deaths = data_deaths,
@@ -322,14 +236,17 @@ def form(category):
                            states_total_cases = states_total_cases, 
                            )
     else:
-        flash('Invalid entry.', 'danger')
+        if (request.form.get('amount')) is not None:
+            flash('Invalid Entry. Please enter a number from 1-50.', 'danger')
         return render_template('form.html', 
                                title='Select Top States', 
+                               button = button,
                                form=form, 
                                category=category,
                                logo = logo,
                                data_source = data_source,
                                curr_date = curr_date,
+                               link = info.link
                                )
 
 
@@ -338,33 +255,69 @@ def choose_source():
     global data_source, info, logo
     data_source = request.form['source']
     if data_source == 'Covid Tracking Project':
+        flash('Data source set to ' + data_source + '.', 'info')
         info = DataSourceCTP()
     elif data_source == 'Our World in Data':
         info = DataSourceOWID()
     else:
         info = DataSourceNYT()
+        flash('Data source set to ' + data_source + '.', 'success')
     logo = info.logo
-    print("Source: ", data_source)
-    print("Request referrer", request.referrer)
     if request.referrer == "http://127.0.0.1:5000/get_state":
         return redirect(url_for("index"))
-    return redirect(request.referrer) #! this does not work when on select_state page. do more research
+    return redirect(request.referrer) #! manual fix. this does not work when on select_state page. do more research
 
+
+@app.route('/data_tables')
+def data_tables():
+    global testdates
+    js_dates = []
+    # info = get_usa_data()  #this is for testing only. delete this one we connect this with the right page and info is set
+    usa_cases = list(info.usa_cases)
+    usa_deaths = list(info.usa_deaths)
+    usa_dates = list(info.usa_dates)
+    usa_total_cases = list(info.usa_daily_total_cases)
+    usa_total_deaths = list(info.usa_daily_total_deaths)
+    
+    for d in usa_dates:
+        js_d = int(time.mktime(d.timetuple())) * 1000
+        js_dates.append(js_d)
+    testdates = js_dates
+
+    print("Latest date", info.latest_date)
+    return render_template('data_tables.html', 
+                           button = button, 
+                           curr_date = info.latest_date,
+                           data_source = data_source,
+                           data_source_id = info.data_source_id,
+                           logo = info.logo, 
+                           link = info.link,
+                           usa_cases = usa_cases,
+                           usa_deaths = usa_deaths,
+                           usa_dates = js_dates,
+                           usa_total_cases = usa_total_cases,
+                           usa_total_deaths = usa_total_deaths
+                           )
+    
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # global usa_total_cases, usa_total_deaths, data_source
+    global button
     get_usa_data()
-    return render_template('index.html', 
+    button = 4
+    return render_template('index.html',
+                           button = button,
                            usa_total_deaths = usa_total_deaths,
                            usa_total_cases = usa_total_cases,
                            curr_date = curr_date,
                            data_source = data_source,
-                           logo = logo
+                           logo = logo,
+                           link = info.link
                            )
 
-@app.route('/about.html')
+@app.route('/about')
 def about():
-    return render_template('about.html')  
+    global button
+    return render_template('about.html', button = button, logo=logo, data_source = data_source, curr_date=curr_date)  
 
 if __name__ == '__main__':
   app.run(debug = False)

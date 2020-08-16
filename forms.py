@@ -6,9 +6,7 @@ from wtforms.validators import DataRequired, Length, NumberRange
 
 
 class Top_States_Form(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=1, max=20)])
-    amount = IntegerField('How many states?', validators=[DataRequired(), NumberRange(1, 50)])
-    starting_date = DateField('Starting Date', format="%Y-%m-%d",validators=[DataRequired()])
+    amount = IntegerField('How many states?', validators=[DataRequired(), NumberRange(min=1, max=50, message='cannot be greater than 50')])
+    starting_date = DateField('Starting Date', format="%Y-%m-%d",validators=[DataRequired()],render_kw={'readonly': True})
     submit = SubmitField('Submit')
 

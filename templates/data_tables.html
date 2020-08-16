@@ -1,0 +1,118 @@
+{% extends "base.html" %} {%block title%} Covid19 Charts {%endblock%} {%block content%}
+<div id="outer" style="position: relative;">
+  <script>
+    document.onload = function () {
+      var logo = document.createElement("img");
+      var image = "/static/img/logos/" + "{{logo}}" + "_logo.png";
+      logo.setAttribute("src", image);
+      logo.setAttribute("style", "height: 46px; border: 1px solid rgb(200,200,200); border-radius:10%; position: absolute; bottom: 0px;");
+      logo.setAttribute("class", "mr-3");
+      document.getElementById("outer").appendChild(logo);
+    };
+  </script>
+
+</div>
+    <div style="text-align: center;">
+      <h1 class="mb-4 font-weight-light">
+        Covid19 in the USA
+      </h1>
+      <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css" crossorigin="anonymous" /-->
+
+      <script>
+        var usa_dates = {{usa_dates | safe}};
+        var usa_cases = {{usa_cases | safe}};
+        var usa_total_cases = {{usa_total_cases | safe}};
+        var usa_deaths = {{usa_deaths | safe}};
+        var usa_total_deaths = {{usa_total_deaths | safe}};
+        console.log("Data source id" + {{data_source_id}});
+
+        usa_cases.reverse();
+        usa_deaths.reverse();
+        usa_total_cases.reverse();
+        usa_total_deaths.reverse();
+        usa_dates.reverse();
+      </script>
+    </div>
+
+    <div class="row justify-content-center">
+      <div id="div_table" class="col-md-8" style="border: 0px red solid;">
+        <table
+          id="myTable"
+          class="table mx-auto w-auto table-striped table-hover table-bordered table-responsive text-center"
+          style="border: 0px yellow solid;"
+        >
+          <thead>
+            <th>Date</th>
+            <th>Total Cases</th>
+            <th>New Cases</th>
+            <th>Total Deaths</th>
+            <th>New Deaths</th>
+          </thead>
+          <tbody>
+            {% for row in usa_cases %}
+            <tr>
+              <td>
+                <script>
+                  var x = {{loop.index}}-1;
+                  d = new Date(usa_dates[x]);
+                  m= d.getMonth()+1;
+                  if(m<10)
+                    m="0"+m;
+                  dd = d.getDate();
+                  if(dd<10)
+                    dd="0"+dd;
+                  yyyy =d.getFullYear();
+
+                  document.write(yyyy+"-"+m+"-"+dd);
+                </script>
+              </td>
+              <td>
+                <script>
+                  var x = {{loop.index}}-1;
+                  document.write(usa_total_cases[x].toLocaleString('en'));
+                </script>
+              </td>
+              <td>
+                <script>
+                  var x = {{loop.index}}-1;
+                  document.write(usa_cases[x].toLocaleString('en'));
+                </script>
+              </td>
+
+              <td class="pl-2 pr-2">
+                <script>
+                  var x = {{loop.index}}-1;
+                  document.write(usa_total_deaths[x].toLocaleString('en'));
+                </script>
+              </td>
+
+              <td class="pl-2 pr-2">
+                <script>
+                  var x = {{loop.index}}-1;
+                  document.write(usa_deaths[x].toLocaleString('en'));
+                </script>
+              </td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      $("#myTable").DataTable({
+        pageLength: 100,
+        filter: true,
+        deferRender: true,
+        scrollY: 1200,
+        scrollCollapse: true,
+        scroller: true,
+        //ordering: true,
+        select: true,
+        bSort: false,
+      });
+    </script>
+
+    {%endblock%}
+  </div>
+</div>
