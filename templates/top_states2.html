@@ -30,7 +30,6 @@
   var data_cases = {{data_cases | safe}};
   var data_deaths = {{data_deaths | safe}};
   var states_total_cases = {{states_total_cases | safe}};
-  console.log(data_deaths[0]);
 
   var msg_txs = "* On 7/27/20, Texas state health officials changed their method of reporting, adding deaths not previously reported.";
   console.log(states_list);
@@ -75,7 +74,6 @@
   };
   var config = {responsive: true};
   var cases = {{row | safe}};
-  console.log(cases);
 
   var div = document.createElement("div");
   div.setAttribute("id", "div"+x);
@@ -202,7 +200,11 @@
   div_deaths.setAttribute("id", "div_deaths_"+x);
   //div_deaths.setAttribute("style","border: 2px solid yellow;");
   div_deaths.setAttribute("class", "col-md-6");
-  div_chart.appendChild(div_deaths);
+  if("{{category}}" == "cases")
+    div_chart.appendChild(div_deaths);
+  else
+    div_chart.prepend(div_deaths);
+
 
   var div_deaths_chart = document.createElement("div");
   div_deaths_chart.setAttribute("id", "div_deaths_chart_"+x);
@@ -240,7 +242,6 @@
   var num_deaths = document.createElement("h2");
   num_deaths.setAttribute("id", "state"+x+"_deaths");
   num_deaths.setAttribute("class", "font-weight-light");
-  console.log(max_deaths[x]);
   num_deaths.innerHTML = "+"+max_deaths[x];
   div_stats1.appendChild(num_deaths);
   var div_stats2 = document.createElement("div");
