@@ -176,6 +176,7 @@ Your app should now run on the Heroku server.
 - For Brooklyn College, CISC 3140, Professor Katherine Chuang
 - August 2020
 
-[//]: # "![W3Validdator badge](https://img.shields.io/w3c-validation/html?style=plastic&targetUrl=https%3A%2F%2Fvalidator.w3.org%2F"
-
-![W3Validdator badge](https://heroku-badge.herokuapp.com/?app=cs3140-covid-web-app) ![Repo size](https://img.shields.io/github/repo-size/rachelf21/3140_Covid_States_Web_App?style=flat)
+![W3Validdator badge](https://img.shields.io/w3c-validation/html?style=flat&targetUrl=https%3A%2F%2Fvalidator.w3.org%2F)
+![W3Validdator badge](https://heroku-badge.herokuapp.com/?app=cs3140-covid-web-app)
+![Travis badge](https://img.shields.io/travis/rachelf21/3140_Covid_States_Web_App)
+![Repo size](https://img.shields.io/github/repo-size/rachelf21/3140_Covid_States_Web_App?style=flat)
