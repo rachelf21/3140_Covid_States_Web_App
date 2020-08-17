@@ -319,5 +319,16 @@ def about():
     global button
     return render_template('about.html', button = button, logo=logo, data_source = data_source, curr_date=curr_date)  
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown', methods=['GET', 'POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down (for travis)'
+    
 if __name__ == '__main__':
   app.run(debug = False)
