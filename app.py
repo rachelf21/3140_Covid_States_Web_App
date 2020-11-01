@@ -46,6 +46,7 @@ df_states = [] #replaced with states_current
 data_cases = []
 data_deaths = []
 top = 3
+x= 0 # temp fix. use for position of starting date in array, instead of rewriting all functions with starting date
 
 ##COLOR SCHEME
 color1 = 'rgb(56,83,93)'
@@ -117,7 +118,9 @@ def create_chart(dates, values, my_color, my_opacity ):
 
 #2 
 def get_states_data(state, starting_date):
-    global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, info, state_total_cases,state_total_deaths
+    global data_source, curr_date, logo, state_increase_cases, state_increase_deaths, info, state_total_cases,state_total_deaths, x
+    
+    #x= np.where(info.state_dates == starting_date)
     
     if info.data_source_id == 2 and len(selected_state)>3:
         state = State_Abbrev().get_abbrev(state)
@@ -125,6 +128,20 @@ def get_states_data(state, starting_date):
     #     info = DataSourceNYT() #no states data from OWID
 
     info.retrieve_data_state(state)
+    
+    formatted_date = starting_date.strftime('%Y-%m-%d')
+    new_date = datetime.strptime(formatted_date, '%Y-%m-%d').date()
+    i=0
+    for d in info.state_dates:
+        i=i+1
+        if new_date == d:
+            x = i
+
+    # try:
+    #     x = info.state_dates.index(new_date)  # preferred way to find position of date, but this does not work
+    # except:
+    #     x = 0
+    
     state_total_cases = info.state_total_cases
     state_total_deaths = info.state_total_deaths
     state_increase_cases = info.state_increase_cases
@@ -135,8 +152,11 @@ def get_states_data(state, starting_date):
     
 #4
 def create_states2_chart(): 
-    global graphJSON_states2_cases, graphJSON_states2_deaths, info, selected_state
-    info = get_states_data(selected_state, starting_date)       
+    global graphJSON_states2_cases, graphJSON_states2_deaths, info, selected_state, x
+    info = get_states_data(selected_state, starting_date)   
+    info.state_dates = info.state_dates[x:]
+    info.state_cases = info.state_cases[x:]
+    info.state_deaths = info.state_deaths[x:]
     graphJSON_states2_cases = create_chart(info.state_dates, info.state_cases, orange, .95) 
     graphJSON_states2_deaths = create_chart(info.state_dates, info.state_deaths, burgundy, .95)
     
@@ -164,7 +184,7 @@ def get_state():
 
 @app.route('/get_max/<category>')
 def get_max(category):
-    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top,button, states_total_cases, info
+    global data_cases, data_deaths, df_states, curr_date, max_cases, max_deaths, states, selected_state,top,button, states_total_cases, info, starting_date
     states_total_cases = []
     data_cases=[]
     data_deaths=[]
@@ -215,39 +235,42 @@ def form(category):
         button = 2
     form = Top_States_Form(request.form)
     #form.amount.data = 3
-    form.starting_date.data = datetime(2020, 3, 1).date()  #this doesn't update later. why?????
-    if form.validate():
-        top = form.amount.data
-        st_date = form.starting_date.data 
-        starting_date = st_date #quick fix for now. fix this later
-        get_max(category)
-        return render_template('top_states2.html', 
-                           states = states,
-                           button = button,
-                           logo = logo,
-                           link = info.link,
-                           data_source = data_source,
-                           data_cases = data_cases,
-                           data_deaths = data_deaths,
-                           curr_date = curr_date,
-                           max_cases = max_cases,
-                           max_deaths = max_deaths,
-                           category=category,
-                           states_total_cases = states_total_cases, 
-                           )
-    else:
-        if (request.form.get('amount')) is not None:
-            flash('Invalid Entry. Please enter a number from 1-50.', 'danger')
-        return render_template('form.html', 
-                               title='Select Top States', 
+    if request.method=='GET':
+        form.starting_date.data = datetime(2020, 9, 1).date()  #this doesn't update later. why?????
+    
+    elif request.method=='POST':
+        if form.validate():
+            top = form.amount.data
+            st_date = form.starting_date.data 
+            starting_date = st_date #quick fix for now. fix this later
+            get_max(category)
+            return render_template('top_states2.html', 
+                               states = states,
                                button = button,
-                               form=form, 
-                               category=category,
                                logo = logo,
+                               link = info.link,
                                data_source = data_source,
+                               data_cases = data_cases,
+                               data_deaths = data_deaths,
                                curr_date = curr_date,
-                               link = info.link
+                               max_cases = max_cases,
+                               max_deaths = max_deaths,
+                               category=category,
+                               states_total_cases = states_total_cases, 
                                )
+        else:
+            if (request.form.get('amount')) is not None:
+                flash('Invalid Entry. Please enter a number from 1-50.', 'danger')
+    return render_template('form.html', 
+                                   title='Select Top States', 
+                                   button = button,
+                                   form=form, 
+                                   category=category,
+                                   logo = logo,
+                                   data_source = data_source,
+                                   curr_date = curr_date,
+                                   link = info.link
+                                   )
 
 
 @app.route('/choose_source', methods=['GET', 'POST'])

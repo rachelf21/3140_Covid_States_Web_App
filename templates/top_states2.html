@@ -1,6 +1,6 @@
 {%extends "base.html"%} {%block title%} Covid19 by {{category}}{%endblock%} {% block content %}
 
-<div id="outer" style="position: relative;">
+<div id="outer" style="position: relative">
   <script>
     var logo = document.createElement("img");
     var image = "/static/img/logos/" + "{{logo}}" + "_logo.png";
@@ -11,9 +11,9 @@
   </script>
 
   <div>
-    <h3 style="text-align: center;" class="font-weight-light border-bottom mb-4">
+    <h3 style="text-align: center" class="font-weight-light border-bottom mb-4">
       States currently reporting the greatest increase of
-      <span class="font-weight-normal" style="color: rgb(197, 56, 24);">{{category}}</span> for {{curr_date}}
+      <span class="font-weight-normal" style="color: rgb(197, 56, 24)">{{category}}</span> for {{curr_date}}
     </h3>
   </div>
 </div>

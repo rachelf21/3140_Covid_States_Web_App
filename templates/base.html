@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css')}}" media="all" />
     <!-- <script type=text/javascript> $(function() { $("#mybutton").click(function (event) { $.getJSON('/get_usa_chart', { },
       function(data) { }); return false; }); }); </script> -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}" />
 
     <title>{%block title%} {%endblock%}</title>
   </head>
@@ -81,6 +82,7 @@
               <!-- <a class="nav-link dropdown-toggle" id="navbarDropdown" href= "/choose_source" role="button" data-toggle="dropdown">Choose data source</a> -->
               <!-- <a class="nav-link" href="/choose_source" role="button">Choose data source</a> -->
               <form class="form-inline nav-link dropdown-item" name="dataForm" action="{{ url_for('choose_source') }}" method="POST">
+                <!-- <label for="source">Select Data Source</label> -->
                 <select
                   class="nav-link"
                   style="background-color: rgb(85, 41, 116); border: 0px solid;"
@@ -119,18 +121,20 @@
       </nav>
 
       <div class="jumbotron text-center">
-        <h1 class="display-4">Covid19 in the United States</h1>
-        <p class="lead">
+
+        
+          <h1 class="display-4 reduceHeadingFont">Covid19 in the United States</h1>
+        <p class="lead reduceFont">
           View graphs of daily new cases and new deaths in the United States and in specific states.
         </p>
-        <div class="row justify-content-center">
-          <a class="btn btn-primary btn-lg mr-4 mt-2" href="/get_usa_chart/">Country Overview</a>
-          <a class="btn btn-primary btn-lg mr-4 mt-2" href="/form/cases">View by New Cases </a>
-          <a class="btn btn-primary btn-lg mr-4 mt-2" href="/form/deaths" >View by New Deaths </a>
+        <div class="row justify-content-center ">
+          <a class="btn btn-primary btn-lg mr-4 mt-2 main-btn" href="/get_usa_chart/">Country Overview</a>
+          <a class="btn btn-primary btn-lg mr-4 mt-2 main-btn" href="/form/cases">View by New Cases </a>
+          <a class="btn btn-primary btn-lg mr-4 mt-2 main-btn" href="/form/deaths" >View by New Deaths </a>
           <form class="form-inline" name="myForm" action="{{ url_for('get_state') }}" method="POST">
             <select
               style="background-color: rgb(85, 41, 116);"
-              class="btn btn-primary btn-lg mr-4 mt-2"
+              class="btn btn-primary btn-lg mr-4 mt-2  main-btn" 
               id="state"
               name="state"
               onchange="this.form.submit()"
@@ -192,7 +196,7 @@
           <!--button id = "example" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button-->
         </div>
       </div>
-
+    
       
       {% with messages = get_flashed_messages(with_categories=true) %}
       <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->

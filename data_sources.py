@@ -88,6 +88,25 @@ class DataSourceNYT(DataSource):
         self.state_dates = self.state_data['date']
         self.latest_date = self.state_data['date'].iloc[-1]   
 
+
+    def retrieve_data_state_date(self, state, date):
+        #start = timeit.default_timer()
+        self.state_data = pd.read_csv(self.url_state, error_bad_lines=False)
+        self.state_data['date'] = pd.to_datetime(self.state_data['date'], format="%Y-%m-%d" )
+        self.state_data['date'] = self.state_data['date'].dt.date
+        self.state_data = self.state_data[self.state_data.state==state]
+        self.state_total_cases = '{:,.0f}'.format(self.state_data['cases'].iloc[-1])
+        self.state_total_deaths = '{:,.0f}'.format(self.state_data['deaths'].iloc[-1])
+        self.state_data['case_increase']=(self.state_data.cases - self.state_data.cases.shift(1))
+        self.state_data['death_increase']=(self.state_data.deaths - self.state_data.deaths.shift(1))
+        self.state_increase_deaths = '{:,.0f}'.format(self.state_data['death_increase'].iloc[-1])
+        self.state_increase_cases = '{:,.0f}'.format(self.state_data['case_increase'].iloc[-1])
+        self.state_cases = self.state_data['case_increase']
+        self.state_deaths = self.state_data['death_increase']
+        self.state_dates = self.state_data['date']
+        self.latest_date = self.state_data['date'].iloc[-1]   
+
+
         #stop = timeit.default_timer()        
         #print("retrieving individual state data from NYT {:.2f}".format(stop-start))
         #state_data = state_data[state_data.date >= starting_date]
@@ -297,8 +316,8 @@ class DataSourceOWID(DataSource):
 #%%
 nyt = DataSourceCTP()
 nyt.retrieve_data_usa()
-
-
+nyt.retrieve_current_states()
+nyt.retrieve_data_state('NY')
 # ctp = DataSourceCTP()
 # #ctp.retrieve_data_state("NY")
 # ctp.retrieve_current_states()
