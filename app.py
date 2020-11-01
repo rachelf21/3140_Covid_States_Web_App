@@ -354,4 +354,4 @@ def shutdown():
     return 'Server shutting down (for travis)'
     
 if __name__ == '__main__':
-  app.run(debug = True)
+  app.run(debug = False)
