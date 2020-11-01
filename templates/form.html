@@ -4,17 +4,23 @@
   {{ form.hidden_tag() }}
 
   <div class="form-group">
-    <legend class="border-bottom mb-4">View states currently reporting the most new {{category}}.<span class="italic font-weight-lighter"> Please be patient for data to load. </span></legend>
+    <legend class="border-bottom mb-4">
+      View states currently reporting the most new {{category}}.<span class="italic font-weight-lighter">
+        Please be patient for data to load.
+      </span>
+    </legend>
 
-  <div class = "row"> 
- 
-    <div class = "col-3">{{ form.starting_date.label(class="form-control-label") }} {{ form.starting_date(class="form-control form-control-lg") }}</div>
- 
-    <div class = "col-3">{{ form.amount.label(class="form-control-label") }} {{ form.amount(class="form-control form-control-lg") }}</div>
+    <div class="row mb-2" style="display: flex">
+      <div class="ml-3 mr-2" style="align-self: flex-end">{{ form.starting_date.label(class="form-control-label") }}</div>
+      <div class="">{{ form.starting_date(class="form-control form-control-lg") }}</div>
+    </div>
 
-    <div class = "col-2 d-flex flex-column justify-content-end"> {{ form.submit(class="btn btn-outline-info  form-control-lg") }} </div>
-</div>
-
+    <div class="row mb-2" style="display: flex">
+      <div class="ml-3 mr-2" style="align-self: flex-end">{{ form.amount.label(class="form-control-label") }}</div>
+      <div class="col-3 col-md-2 col-xl-1">{{ form.amount(class="form-control form-control-lg") }}</div>
+      <div class="col-3 col-md-2 col-lg-1 mb-0">{{ form.submit(class="btn btn-outline-info form-control-lg") }}</div>
+    </div>
+  </div>
 </form>
 
 {%endblock%}
