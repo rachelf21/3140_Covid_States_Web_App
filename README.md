@@ -1,6 +1,6 @@
 # Covid19 Web Application
 
-This web application allows the user to view charts for daily cases and daily deaths in different states across the United States. User can choose to sort by cases, deaths or view a specific state. [Click here to run the application.](https://cs3140-covid-web-app.herokuapp.com/)
+This web application allows the user to view charts for daily cases and daily deaths in different states across the United States. User can choose to sort by cases, deaths or view a specific state. [Click here to run the application.](https://cs3140-covid-web-app.herokuapp.com/) Please note that due to the free hosting service being used, the initial web page will take 2 minutes to load. Thank you for your patience!
 
 ![Screenshot off app](https://raw.githubusercontent.com/rachelf21/3140_Covid_States_Web_App/master/static/img/screenshot.jpg)
 
